@@ -32,6 +32,12 @@ export async function GET() {
 export async function PATCH(request: Request) {
   try {
     const admin = await getCurrentAdmin();
+    if (!admin) {
+      return NextResponse.json(
+        { error: 'Acceso no autorizado. Se requiere sesión activa de administrador.' },
+        { status: 401 }
+      );
+    }
     const body = await request.json();
     const { id, winningNumber } = body;
 

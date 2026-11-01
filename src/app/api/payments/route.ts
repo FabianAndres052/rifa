@@ -6,6 +6,13 @@ import { getCurrentAdmin } from '@/lib/auth';
 // GET: Historial completo de pagos y abonos
 export async function GET() {
   try {
+    const admin = await getCurrentAdmin();
+    if (!admin) {
+      return NextResponse.json(
+        { error: 'Acceso no autorizado. Se requiere sesión activa de administrador.' },
+        { status: 401 }
+      );
+    }
     const payments = await prisma.payment.findMany({
       orderBy: { paidAt: 'desc' },
       include: {
@@ -46,6 +53,12 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const admin = await getCurrentAdmin();
+    if (!admin) {
+      return NextResponse.json(
+        { error: 'Acceso no autorizado. Se requiere sesión activa de administrador.' },
+        { status: 401 }
+      );
+    }
     const body = await request.json();
     const {
       customerId,

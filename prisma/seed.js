@@ -6,25 +6,26 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('Iniciando verificación y poblado de datos en MySQL...');
 
-  // 1. Administrador por defecto
+  // 1. Administrador del sistema
   const existingAdmin = await prisma.administrator.findFirst({
-    where: { username: 'admin' },
+    where: { username: 'Samuel2305' },
   });
 
   if (!existingAdmin) {
+    const defaultPass = process.env.INITIAL_ADMIN_PASSWORD || 'SamuelRicardo2305';
     const salt = await bcrypt.genSalt(10);
-    const passwordHash = await bcrypt.hash('admin1234', salt);
+    const passwordHash = await bcrypt.hash(defaultPass, salt);
 
     await prisma.administrator.create({
       data: {
         id: 'adm-00000000-0000-0000-0000-000000000001',
-        username: 'admin',
+        username: 'Samuel2305',
         passwordHash,
-        fullName: 'Administrador Principal',
+        fullName: 'Samuel Ricardo',
         role: 'SUPERADMIN',
       },
     });
-    console.log('✓ Administrador principal creado (usuario: admin, pass: admin1234)');
+    console.log('✓ Administrador principal creado');
   } else {
     console.log('✓ Administrador ya existe en la base de datos');
   }

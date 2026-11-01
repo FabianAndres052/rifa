@@ -9,6 +9,13 @@ export async function GET(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const admin = await getCurrentAdmin();
+    if (!admin) {
+      return NextResponse.json(
+        { error: 'Acceso no autorizado. Se requiere sesión activa de administrador.' },
+        { status: 401 }
+      );
+    }
     const { id } = await context.params;
 
     const customer = await prisma.customer.findUnique({
@@ -62,6 +69,12 @@ export async function PUT(
 ) {
   try {
     const admin = await getCurrentAdmin();
+    if (!admin) {
+      return NextResponse.json(
+        { error: 'Acceso no autorizado. Se requiere sesión activa de administrador.' },
+        { status: 401 }
+      );
+    }
     const { id } = await context.params;
     const body = await request.json();
     const { fullName, phone, address, notes, paymentStatus } = body;
@@ -176,6 +189,12 @@ export async function DELETE(
 ) {
   try {
     const admin = await getCurrentAdmin();
+    if (!admin) {
+      return NextResponse.json(
+        { error: 'Acceso no autorizado. Se requiere sesión activa de administrador.' },
+        { status: 401 }
+      );
+    }
     const { id } = await context.params;
 
     const result = await prisma.$transaction(async (tx) => {

@@ -121,9 +121,10 @@ git push -u origin main
 
 ## 5. CREDENCIALES DE ACCESO AL PANEL ADMINISTRATIVO
 
-- **Ruta de acceso**: `/login` (ej: `http://localhost:3000/login` o `https://tu-dominio.vercel.app/login`)
-- **Usuario**: `admin`
-- **Contraseña**: `admin1234`
+- **Ruta de acceso**: `/login` (ej: `https://rifa-rifa-1373.vercel.app/login`)
+- **Usuario**: `Samuel2305`
+- **Contraseña**: La contraseña asignada por el propietario del sistema (cifrada con Bcrypt).
+- **Protección de Seguridad**: Bloqueo preventivo temporal automático tras 5 intentos fallidos consecutivos.
 
 ---
 

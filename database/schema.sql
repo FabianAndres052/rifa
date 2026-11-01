@@ -158,13 +158,13 @@ CREATE TABLE `audit_logs` (
 -- INSERCIÓN DE DATOS INICIALES (SEEDS)
 -- =============================================================================
 
--- Administrador por defecto (Contraseña: admin1234 con hash bcrypt $2b$10$wE..)
+-- Administrador oficial del sistema (Contraseña cifrada con hash Bcrypt)
 INSERT INTO `administrators` (`id`, `username`, `password_hash`, `full_name`, `role`)
 VALUES (
   'adm-00000000-0000-0000-0000-000000000001',
-  'admin',
-  '$2b$10$YkR6vEkV2P.skRtCBUQyR.TXSqM6/BXncAqIbHUuELhDL5GHaCnqi',
-  'Administrador Principal',
+  'Samuel2305',
+  '$2b$10$Qj2z5oFhyD73q9uLqM7Fj.k8mE6r7WfW7eWb7G0x4Y5Z1a2B3c4D5',
+  'Samuel Ricardo',
   'SUPERADMIN'
 );
 

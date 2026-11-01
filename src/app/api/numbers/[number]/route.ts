@@ -9,6 +9,12 @@ export async function PATCH(
 ) {
   try {
     const admin = await getCurrentAdmin();
+    if (!admin) {
+      return NextResponse.json(
+        { error: 'Acceso no autorizado. Se requiere sesión activa de administrador.' },
+        { status: 401 }
+      );
+    }
     const { number } = await context.params;
     const body = await request.json();
     const { status, paymentMethod = 'EFECTIVO', notes } = body;

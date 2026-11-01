@@ -6,6 +6,13 @@ import { getCurrentAdmin } from '@/lib/auth';
 // GET: Consultar clientes con búsqueda y filtro de estado de pago
 export async function GET(request: Request) {
   try {
+    const admin = await getCurrentAdmin();
+    if (!admin) {
+      return NextResponse.json(
+        { error: 'Acceso no autorizado. Se requiere sesión activa de administrador.' },
+        { status: 401 }
+      );
+    }
     const { searchParams } = new URL(request.url);
     const q = searchParams.get('q')?.trim() || '';
     const statusFilter = searchParams.get('status') || 'ALL'; // ALL, PAID, PENDING, PARTIAL
@@ -109,6 +116,12 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const admin = await getCurrentAdmin();
+    if (!admin) {
+      return NextResponse.json(
+        { error: 'Acceso no autorizado. Se requiere sesión activa de administrador.' },
+        { status: 401 }
+      );
+    }
     const body = await request.json();
     const {
       fullName,
