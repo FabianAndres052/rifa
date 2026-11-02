@@ -11,7 +11,9 @@ import {
   Clock,
   FileText,
   Search,
-  Plus
+  Plus,
+  Trash2,
+  AlertCircle
 } from 'lucide-react';
 import Header from '@/components/Header';
 import PaymentModal from '@/components/PaymentModal';
@@ -21,12 +23,26 @@ interface PaymentItem {
   customerId: string;
   customerName: string;
   customerPhone: string;
+  customerNumbers?: string[];
+  customerTotalPurchased?: number;
+  customerTotalPaid?: number;
+  customerPendingBalance?: number;
   amount: number;
   paymentType: 'TOTAL' | 'ABONO';
   paymentMethod: string;
   reference?: string | null;
   paidAt: string;
   notes?: string | null;
+}
+
+interface CustomerOption {
+  id: string;
+  fullName: string;
+  numbersCount?: number;
+  numbers?: string[];
+  totalPurchased?: number;
+  totalPaid?: number;
+  pendingBalance?: number;
 }
 
 export default function FinancePage() {
@@ -41,12 +57,36 @@ export default function FinancePage() {
   });
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   // Clientes para modal de abono
-  const [customers, setCustomers] = useState<{ id: string; fullName: string }[]>([]);
+  const [customers, setCustomers] = useState<CustomerOption[]>([]);
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [selectedCustomerId, setSelectedCustomerId] = useState('');
   const [selectedCustomerName, setSelectedCustomerName] = useState('');
+  const [selectedCustomerPending, setSelectedCustomerPending] = useState<number | undefined>(undefined);
+  const [selectedCustomerPaid, setSelectedCustomerPaid] = useState<number | undefined>(undefined);
+
+  const handleDeletePayment = async (p: PaymentItem) => {
+    const confirmMsg = `¿Está seguro de eliminar este abono de $${p.amount.toLocaleString(
+      'es-CO'
+    )} COP registrado para "${p.customerName}"?\n\nEsta acción revertirá el pago en la base de datos y recalculará las estadísticas de Finanzas inmediatamente.`;
+    if (!window.confirm(confirmMsg)) return;
+
+    setDeletingId(p.id);
+    try {
+      const res = await fetch(`/api/payments?id=${p.id}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Error al eliminar abono');
+      loadFinanceData();
+    } catch (err: any) {
+      alert(err.message || 'Error al eliminar el abono');
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   const loadFinanceData = useCallback(async () => {
     try {
@@ -130,7 +170,7 @@ export default function FinancePage() {
           </div>
 
           {customers.length > 0 && (
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <select
                 className="px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white"
                 onChange={(e) => {
@@ -138,6 +178,13 @@ export default function FinancePage() {
                   if (cust) {
                     setSelectedCustomerId(cust.id);
                     setSelectedCustomerName(cust.fullName);
+                    setSelectedCustomerPending(cust.pendingBalance);
+                    setSelectedCustomerPaid(cust.totalPaid);
+                  } else {
+                    setSelectedCustomerId('');
+                    setSelectedCustomerName('');
+                    setSelectedCustomerPending(undefined);
+                    setSelectedCustomerPaid(undefined);
                   }
                 }}
                 value={selectedCustomerId}
@@ -145,10 +192,39 @@ export default function FinancePage() {
                 <option value="">-- Seleccionar cliente para abono --</option>
                 {customers.map((c) => (
                   <option key={c.id} value={c.id}>
-                    {c.fullName}
+                    {c.fullName} {c.pendingBalance !== undefined && c.pendingBalance > 0 ? `(Debe: $${c.pendingBalance.toLocaleString('es-CO')})` : ''}
                   </option>
                 ))}
               </select>
+
+              {(() => {
+                const selectedCust = customers.find((c) => c.id === selectedCustomerId);
+                if (!selectedCust) return null;
+                return (
+                  <div className="hidden sm:flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs">
+                    {selectedCust.numbers && selectedCust.numbers.length > 0 && (
+                      <span className="text-slate-400">
+                        Núm:{' '}
+                        <span className="font-mono font-bold text-amber-300">
+                          {selectedCust.numbers.map((n) => `#${n}`).join(', ')}
+                        </span>
+                      </span>
+                    )}
+                    <span className="text-slate-400">
+                      Abonó:{' '}
+                      <span className="font-mono font-bold text-emerald-400">
+                        ${(selectedCust.totalPaid || 0).toLocaleString('es-CO')}
+                      </span>
+                    </span>
+                    <span className="text-slate-400">
+                      Debe:{' '}
+                      <span className="font-mono font-black text-amber-300">
+                        ${(selectedCust.pendingBalance || 0).toLocaleString('es-CO')} COP
+                      </span>
+                    </span>
+                  </div>
+                );
+              })()}
 
               <button
                 type="button"
@@ -247,54 +323,93 @@ export default function FinancePage() {
             <table className="w-full text-left text-xs sm:text-sm">
               <thead className="bg-slate-950/80 text-slate-400 uppercase tracking-wider text-[11px] border-b border-slate-800">
                 <tr>
-                  <th className="px-5 py-3.5 font-bold">Fecha & Hora</th>
-                  <th className="px-5 py-3.5 font-bold">Cliente</th>
-                  <th className="px-5 py-3.5 font-bold">Monto</th>
-                  <th className="px-5 py-3.5 font-bold">Tipo</th>
-                  <th className="px-5 py-3.5 font-bold">Método</th>
-                  <th className="px-5 py-3.5 font-bold">Referencia / Notas</th>
+                  <th className="px-4 py-3.5 font-bold">Fecha & Hora</th>
+                  <th className="px-4 py-3.5 font-bold">Cliente</th>
+                  <th className="px-4 py-3.5 font-bold">Monto Abono</th>
+                  <th className="px-4 py-3.5 font-bold">Total Abonado</th>
+                  <th className="px-4 py-3.5 font-bold">Saldo Pendiente (Debe)</th>
+                  <th className="px-4 py-3.5 font-bold">Tipo & Método</th>
+                  <th className="px-4 py-3.5 font-bold">Referencia / Notas</th>
+                  <th className="px-4 py-3.5 font-bold text-center">Acciones</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60">
                 {filteredPayments.map((p) => (
                   <tr key={p.id} className="hover:bg-slate-800/40 transition-colors">
-                    <td className="px-5 py-3.5 font-mono text-slate-300 text-xs">
+                    <td className="px-4 py-3.5 font-mono text-slate-300 text-xs whitespace-nowrap">
                       {new Date(p.paidAt).toLocaleString('es-CO')}
                     </td>
-                    <td className="px-5 py-3.5">
+                    <td className="px-4 py-3.5">
                       <div className="font-bold text-white">{p.customerName}</div>
-                      <div className="text-[11px] text-slate-400 font-mono">{p.customerPhone}</div>
+                      <div className="text-[11px] text-slate-400 font-mono flex items-center gap-1.5 mt-0.5">
+                        <span>{p.customerPhone}</span>
+                        {p.customerNumbers && p.customerNumbers.length > 0 && (
+                          <span className="text-amber-400 font-bold">
+                            [{p.customerNumbers.map((n) => `#${n}`).join(', ')}]
+                          </span>
+                        )}
+                      </div>
                     </td>
-                    <td className="px-5 py-3.5 font-mono font-black text-emerald-400 text-base">
+                    <td className="px-4 py-3.5 font-mono font-black text-emerald-400 text-sm sm:text-base whitespace-nowrap">
                       ${p.amount.toLocaleString('es-CO')} COP
                     </td>
-                    <td className="px-5 py-3.5">
+                    <td className="px-4 py-3.5 font-mono font-bold text-emerald-300 text-xs whitespace-nowrap">
+                      ${(p.customerTotalPaid ?? p.amount).toLocaleString('es-CO')} COP
+                    </td>
+                    <td className="px-4 py-3.5 whitespace-nowrap">
                       <span
-                        className={`inline-block px-2 py-0.5 rounded text-[11px] font-bold ${
-                          p.paymentType === 'TOTAL'
-                            ? 'bg-emerald-950 text-emerald-300 border border-emerald-800/40'
-                            : 'bg-amber-950 text-amber-300 border border-amber-800/40'
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono font-bold ${
+                          (p.customerPendingBalance ?? 0) > 0
+                            ? 'bg-amber-950/80 border border-amber-600/50 text-amber-300'
+                            : 'bg-emerald-950/80 border border-emerald-600/50 text-emerald-300'
                         }`}
                       >
-                        {p.paymentType === 'TOTAL' ? 'PAGO COMPLETO' : 'ABONO PARCIAL'}
+                        ${(p.customerPendingBalance ?? 0).toLocaleString('es-CO')} COP
+                        {(p.customerPendingBalance ?? 0) > 0 ? (
+                          <span className="text-[10px] uppercase font-sans text-amber-400 font-extrabold">(Debe)</span>
+                        ) : (
+                          <span className="text-[10px] uppercase font-sans text-emerald-400 font-extrabold">(Al día)</span>
+                        )}
                       </span>
                     </td>
-                    <td className="px-5 py-3.5 font-semibold text-slate-200">
-                      {p.paymentMethod}
+                    <td className="px-4 py-3.5 whitespace-nowrap">
+                      <div className="flex flex-col gap-1">
+                        <span
+                          className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold w-fit ${
+                            p.paymentType === 'TOTAL'
+                              ? 'bg-emerald-950 text-emerald-300 border border-emerald-800/40'
+                              : 'bg-blue-950 text-sky-300 border border-blue-800/40'
+                          }`}
+                        >
+                          {p.paymentType === 'TOTAL' ? 'PAGO COMPLETO' : 'ABONO PARCIAL'}
+                        </span>
+                        <span className="text-xs text-slate-300 font-semibold">{p.paymentMethod}</span>
+                      </div>
                     </td>
-                    <td className="px-5 py-3.5 text-xs text-slate-400">
+                    <td className="px-4 py-3.5 text-xs text-slate-400">
                       {p.reference && (
                         <div className="font-mono text-amber-400 font-medium">Ref: {p.reference}</div>
                       )}
                       {p.notes && <div>{p.notes}</div>}
                       {!p.reference && !p.notes && <span className="text-slate-600">-</span>}
                     </td>
+                    <td className="px-4 py-3.5 text-center whitespace-nowrap">
+                      <button
+                        type="button"
+                        title="Eliminar este abono/pago"
+                        disabled={deletingId === p.id}
+                        onClick={() => handleDeletePayment(p)}
+                        className="p-2 rounded-xl text-slate-400 hover:text-red-400 hover:bg-red-950/50 border border-slate-800 hover:border-red-800/50 transition-all cursor-pointer disabled:opacity-50"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </td>
                   </tr>
                 ))}
 
                 {filteredPayments.length === 0 && !loading && (
                   <tr>
-                    <td colSpan={6} className="text-center py-12 text-slate-500">
+                    <td colSpan={8} className="text-center py-12 text-slate-500">
                       No se registran pagos en el historial todavía.
                     </td>
                   </tr>
@@ -311,6 +426,8 @@ export default function FinancePage() {
         onClose={() => setPaymentModalOpen(false)}
         customerId={selectedCustomerId}
         customerName={selectedCustomerName}
+        pendingBalance={selectedCustomerPending}
+        totalPaid={selectedCustomerPaid}
         onSuccess={loadFinanceData}
       />
     </div>

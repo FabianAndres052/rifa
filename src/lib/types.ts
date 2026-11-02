@@ -5,6 +5,10 @@ export type PaymentType = 'TOTAL' | 'ABONO';
 export interface RaffleNumberData {
   number: string;
   status: NumberStatus;
+  hasAbono?: boolean;
+  totalPaid?: number;
+  pendingBalance?: number;
+  totalPurchased?: number;
   price: number;
   customerId?: string | null;
   updatedAt: string;
@@ -13,6 +17,9 @@ export interface RaffleNumberData {
     fullName: string;
     phone: string;
     address: string;
+    totalPaid?: number;
+    pendingBalance?: number;
+    hasAbono?: boolean;
   } | null;
   assignment?: {
     id: string;

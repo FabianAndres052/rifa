@@ -18,16 +18,34 @@ export async function GET(request: Request) {
     const statusFilter = searchParams.get('status') || 'ALL'; // ALL, PAID, PENDING, PARTIAL
     const minimal = searchParams.get('minimal') === 'true';
 
-    // Si se solicita versión mínima (solo id y nombre para selectores/combos)
+    // Si se solicita versión mínima (con datos de números y saldo para selectores/combos)
     if (minimal) {
       const minimalCustomers = await prisma.customer.findMany({
         select: {
           id: true,
           fullName: true,
+          numbers: { select: { number: true, price: true } },
+          payments: { select: { amount: true } },
         },
         orderBy: { fullName: 'asc' },
       });
-      return NextResponse.json(minimalCustomers);
+
+      const formatted = minimalCustomers.map((c) => {
+        const totalPurchased = c.numbers.reduce((s, n) => s + Number(n.price || 40000), 0);
+        const totalPaid = c.payments.reduce((s, p) => s + Number(p.amount), 0);
+        const pendingBalance = Math.max(0, totalPurchased - totalPaid);
+        return {
+          id: c.id,
+          fullName: c.fullName,
+          numbersCount: c.numbers.length,
+          numbers: c.numbers.map((n) => n.number),
+          totalPurchased,
+          totalPaid,
+          pendingBalance,
+        };
+      });
+
+      return NextResponse.json(formatted);
     }
 
     // Obtener todos los clientes con sus números y pagos

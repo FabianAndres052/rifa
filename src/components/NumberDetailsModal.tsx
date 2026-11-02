@@ -38,7 +38,14 @@ export default function NumberDetailsModal({
 
   if (!isOpen || !numberData) return null;
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (status: string, hasAbono?: boolean) => {
+    if (hasAbono) {
+      return {
+        label: 'Con Abono Parcial (¡Debe Saldo!)',
+        bg: 'bg-blue-950 border-blue-500/50 text-blue-300',
+        dot: 'bg-blue-400',
+      };
+    }
     switch (status) {
       case 'AVAILABLE':
         return {
@@ -73,7 +80,7 @@ export default function NumberDetailsModal({
     }
   };
 
-  const statusInfo = getStatusBadge(numberData.status);
+  const statusInfo = getStatusBadge(numberData.status, numberData.hasAbono);
 
   // Cambiar estado del número (ej: marcar como pagado o liberarlo)
   const handleUpdateStatus = async (newStatus: string) => {
@@ -190,6 +197,27 @@ export default function NumberDetailsModal({
                       Registrado:{' '}
                       {new Date(numberData.assignment.assignedAt).toLocaleString('es-CO')}
                     </span>
+                  </div>
+                )}
+
+                {numberData.hasAbono && (
+                  <div className="mt-3 p-3 rounded-xl bg-blue-950/80 border border-blue-500/50 space-y-1.5 text-xs">
+                    <div className="flex items-center justify-between text-blue-200 font-bold">
+                      <span>Estado Financiero:</span>
+                      <span className="uppercase text-sky-300">Con Abono Parcial</span>
+                    </div>
+                    <div className="flex items-center justify-between text-slate-300">
+                      <span>Abonado hasta ahora:</span>
+                      <span className="font-mono font-bold text-emerald-400">
+                        ${numberData.totalPaid?.toLocaleString('es-CO')} COP
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-slate-300">
+                      <span>Resta por pagar (Debe):</span>
+                      <span className="font-mono font-black text-amber-300 text-sm">
+                        ${numberData.pendingBalance?.toLocaleString('es-CO')} COP
+                      </span>
+                    </div>
                   </div>
                 )}
               </div>

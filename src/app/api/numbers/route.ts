@@ -15,6 +15,12 @@ export async function GET() {
             fullName: true,
             phone: true,
             address: true,
+            payments: {
+              select: { amount: true },
+            },
+            numbers: {
+              select: { price: true },
+            },
           },
         },
         assignment: {
@@ -28,20 +34,57 @@ export async function GET() {
       },
     });
 
-    const formatted = numbers.map((n) => ({
-      number: n.number,
-      status: n.status,
-      price: Number(n.price),
-      customerId: n.customerId,
-      updatedAt: n.updatedAt.toISOString(),
-      customer: n.customer,
-      assignment: n.assignment
-        ? {
-            ...n.assignment,
-            assignedAt: n.assignment.assignedAt.toISOString(),
-          }
-        : null,
-    }));
+    const ticketPrice = 40000;
+
+    const formatted = numbers.map((n) => {
+      let hasAbono = false;
+      let totalPaid = 0;
+      let pendingBalance = 0;
+      let totalPurchased = 0;
+
+      if (n.customer) {
+        totalPaid = n.customer.payments.reduce((s, p) => s + Number(p.amount), 0);
+        totalPurchased = n.customer.numbers.reduce(
+          (s, num) => s + Number(num.price || ticketPrice),
+          0
+        );
+        pendingBalance = Math.max(0, totalPurchased - totalPaid);
+
+        // Si el cliente tiene abonos pero aún debe y el número está pendiente
+        if (totalPaid > 0 && totalPaid < totalPurchased && n.status === 'SOLD_PENDING') {
+          hasAbono = true;
+        }
+      }
+
+      return {
+        number: n.number,
+        status: n.status,
+        hasAbono,
+        totalPaid,
+        pendingBalance,
+        totalPurchased,
+        price: Number(n.price),
+        customerId: n.customerId,
+        updatedAt: n.updatedAt.toISOString(),
+        customer: n.customer
+          ? {
+              id: n.customer.id,
+              fullName: n.customer.fullName,
+              phone: n.customer.phone,
+              address: n.customer.address,
+              totalPaid,
+              pendingBalance,
+              hasAbono,
+            }
+          : null,
+        assignment: n.assignment
+          ? {
+              ...n.assignment,
+              assignedAt: n.assignment.assignedAt.toISOString(),
+            }
+          : null,
+      };
+    });
 
     return NextResponse.json(formatted);
   } catch (error) {

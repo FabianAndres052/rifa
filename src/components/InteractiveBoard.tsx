@@ -36,11 +36,15 @@ export default function InteractiveBoard({
   const [selectedNumbers, setSelectedNumbers] = useState<string[]>([]);
 
   // Función para obtener clase CSS de color según el estado
-  const getStatusColor = (status: NumberStatus, isSelected: boolean) => {
+  const getStatusColor = (item: RaffleNumberData, isSelected: boolean) => {
     if (isSelected) {
-      return 'bg-blue-600 text-white border-2 border-white ring-4 ring-blue-400/50 shadow-xl scale-105 z-10';
+      return 'bg-amber-400 text-slate-950 font-black border-2 border-white ring-4 ring-amber-400/50 shadow-xl scale-105 z-10';
     }
-    switch (status) {
+    // Si el cliente tiene un abono registrado pero aún debe saldo -> COLOR AZUL DIFERENCIADO
+    if (item.hasAbono) {
+      return 'bg-blue-600 hover:bg-blue-500 text-white font-black border-2 border-sky-300 shadow-md shadow-blue-950/60 ring-1 ring-blue-400/50';
+    }
+    switch (item.status) {
       case 'AVAILABLE':
         // Verde
         return 'bg-emerald-600/90 hover:bg-emerald-500 text-white border border-emerald-400/50 shadow-sm shadow-emerald-950/40';
@@ -78,7 +82,13 @@ export default function InteractiveBoard({
 
   // Filtrado de números para vista táctica
   const filteredNumbers = numbers.filter((item) => {
-    if (filterStatus !== 'ALL' && item.status !== filterStatus) return false;
+    if (filterStatus === 'PARTIAL') {
+      if (!item.hasAbono) return false;
+    } else if (filterStatus === 'SOLD_PENDING') {
+      if (item.status !== 'SOLD_PENDING' || item.hasAbono) return false;
+    } else if (filterStatus !== 'ALL' && item.status !== filterStatus) {
+      return false;
+    }
     if (searchQuery.trim() !== '') {
       const q = searchQuery.toLowerCase();
       const numMatch = item.number.includes(q);
@@ -93,7 +103,8 @@ export default function InteractiveBoard({
     AVAILABLE: numbers.filter((n) => n.status === 'AVAILABLE').length,
     RESERVED: numbers.filter((n) => n.status === 'RESERVED').length,
     SOLD_PAID: numbers.filter((n) => n.status === 'SOLD_PAID').length,
-    SOLD_PENDING: numbers.filter((n) => n.status === 'SOLD_PENDING').length,
+    PARTIAL_PAID: numbers.filter((n) => n.hasAbono).length,
+    SOLD_PENDING: numbers.filter((n) => n.status === 'SOLD_PENDING' && !n.hasAbono).length,
   };
 
   return (
@@ -184,6 +195,16 @@ export default function InteractiveBoard({
           </div>
 
           <div className="flex items-center gap-2.5 p-2 rounded-xl bg-slate-950/70 border border-slate-800">
+            <div className="w-4 h-4 rounded-md bg-blue-600 border border-sky-300 shadow-sm shadow-blue-500/50" />
+            <div className="flex flex-col">
+              <span className="text-xs font-bold text-sky-200">Con Abono (Debe)</span>
+              <span className="text-[11px] font-semibold text-blue-400">
+                {counts.PARTIAL_PAID} números
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2.5 p-2 rounded-xl bg-slate-950/70 border border-slate-800">
             <div className="w-4 h-4 rounded-md bg-orange-500 shadow-sm shadow-orange-500/50" />
             <div className="flex flex-col">
               <span className="text-xs font-bold text-slate-200">Pendiente de Pago</span>
@@ -261,14 +282,18 @@ export default function InteractiveBoard({
               >
                 {numbers.map((item) => {
                   const isSelected = selectedNumbers.includes(item.number);
-                  const statusClass = getStatusColor(item.status, isSelected);
+                  const statusClass = getStatusColor(item, isSelected);
+
+                  const titleText = item.hasAbono
+                    ? `Número #${item.number} - ${item.customer?.fullName || 'Cliente'} (Abonó: $${item.totalPaid?.toLocaleString('es-CO')} | Resta por pagar: $${item.pendingBalance?.toLocaleString('es-CO')} COP)`
+                    : `Número #${item.number} - ${item.status === 'AVAILABLE' ? 'Disponible' : item.customer?.fullName || item.status}`;
 
                   return (
                     <button
                       key={item.number}
                       type="button"
                       onClick={() => handleCellClick(item)}
-                      title={`Número #${item.number} - ${item.status === 'AVAILABLE' ? 'Disponible' : item.customer?.fullName || item.status}`}
+                      title={titleText}
                       className={`relative flex items-center justify-center font-mono text-[11px] sm:text-sm md:text-base font-extrabold rounded-[3px] transition-all duration-100 cursor-pointer select-none active:scale-95 ${statusClass}`}
                     >
                       <span>{item.number}</span>
@@ -311,6 +336,7 @@ export default function InteractiveBoard({
                 { id: 'ALL', label: 'Todos (100)' },
                 { id: 'AVAILABLE', label: `Disponibles (${counts.AVAILABLE})` },
                 { id: 'SOLD_PAID', label: `Pagados (${counts.SOLD_PAID})` },
+                { id: 'PARTIAL', label: `Con Abono (${counts.PARTIAL_PAID})` },
                 { id: 'SOLD_PENDING', label: `Pendientes (${counts.SOLD_PENDING})` },
                 { id: 'RESERVED', label: `Reservados (${counts.RESERVED})` },
               ].map((btn) => (
@@ -333,7 +359,7 @@ export default function InteractiveBoard({
           <div className="grid grid-cols-5 sm:grid-cols-10 gap-2 sm:gap-2.5">
             {filteredNumbers.map((item) => {
               const isSelected = selectedNumbers.includes(item.number);
-              const statusClass = getStatusColor(item.status, isSelected);
+              const statusClass = getStatusColor(item, isSelected);
 
               return (
                 <button
@@ -347,7 +373,9 @@ export default function InteractiveBoard({
                   </span>
 
                   <span className="text-[9px] font-bold tracking-tight uppercase truncate max-w-full opacity-90">
-                    {item.status === 'AVAILABLE'
+                    {item.hasAbono
+                      ? 'ABONO'
+                      : item.status === 'AVAILABLE'
                       ? 'DISP'
                       : item.status === 'RESERVED'
                       ? 'RESERV'

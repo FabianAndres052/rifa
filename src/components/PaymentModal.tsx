@@ -9,6 +9,8 @@ interface PaymentModalProps {
   onClose: () => void;
   customerId: string;
   customerName: string;
+  pendingBalance?: number;
+  totalPaid?: number;
   onSuccess: () => void;
 }
 
@@ -17,15 +19,35 @@ export default function PaymentModal({
   onClose,
   customerId,
   customerName,
+  pendingBalance,
+  totalPaid,
   onSuccess,
 }: PaymentModalProps) {
-  const [amount, setAmount] = useState('40000');
-  const [paymentType, setPaymentType] = useState<'ABONO' | 'TOTAL'>('ABONO');
+  const [amount, setAmount] = useState(
+    pendingBalance && pendingBalance > 0 ? pendingBalance.toString() : '40000'
+  );
+  const [paymentType, setPaymentType] = useState<'ABONO' | 'TOTAL'>(
+    pendingBalance && pendingBalance > 0 ? 'ABONO' : 'TOTAL'
+  );
   const [paymentMethod, setPaymentMethod] = useState('EFECTIVO');
   const [reference, setReference] = useState('');
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Sincronizar monto sugerido si cambia pendingBalance al abrir
+  React.useEffect(() => {
+    if (isOpen) {
+      if (pendingBalance && pendingBalance > 0) {
+        setAmount(pendingBalance.toString());
+        setPaymentType('ABONO');
+      } else {
+        setAmount('40000');
+        setPaymentType('TOTAL');
+      }
+      setError(null);
+    }
+  }, [isOpen, pendingBalance]);
 
   if (!isOpen) return null;
 
@@ -107,6 +129,23 @@ export default function PaymentModal({
             <div className="p-3 rounded-xl bg-red-950/80 border border-red-500/50 text-red-200 text-xs flex items-center gap-2">
               <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
               <span>{error}</span>
+            </div>
+          )}
+
+          {(totalPaid !== undefined || pendingBalance !== undefined) && (
+            <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 grid grid-cols-2 gap-2 text-xs">
+              <div className="p-2 rounded-lg bg-emerald-950/40 border border-emerald-900/40">
+                <span className="block text-[10px] text-emerald-400 font-bold uppercase">Ya Abonó</span>
+                <span className="font-mono font-bold text-emerald-300 text-sm">
+                  ${(totalPaid || 0).toLocaleString('es-CO')} COP
+                </span>
+              </div>
+              <div className="p-2 rounded-lg bg-amber-950/40 border border-amber-900/40">
+                <span className="block text-[10px] text-amber-400 font-bold uppercase">Resta por Pagar (Debe)</span>
+                <span className="font-mono font-black text-amber-300 text-sm">
+                  ${(pendingBalance || 0).toLocaleString('es-CO')} COP
+                </span>
+              </div>
             </div>
           )}
 

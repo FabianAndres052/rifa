@@ -21,23 +21,42 @@ export async function GET() {
             id: true,
             fullName: true,
             phone: true,
+            numbers: { select: { number: true, price: true } },
+            payments: { select: { amount: true } },
           },
         },
       },
     });
 
-    const formatted = payments.map((p) => ({
-      id: p.id,
-      customerId: p.customerId,
-      customerName: p.customer.fullName,
-      customerPhone: p.customer.phone,
-      amount: Number(p.amount),
-      paymentType: p.paymentType,
-      paymentMethod: p.paymentMethod,
-      reference: p.reference,
-      paidAt: p.paidAt.toISOString(),
-      notes: p.notes,
-    }));
+    const ticketPrice = 40000;
+
+    const formatted = payments.map((p) => {
+      const customerNumbers = p.customer?.numbers?.map((n) => n.number) || [];
+      const customerTotalPurchased = p.customer?.numbers
+        ? p.customer.numbers.reduce((s, n) => s + Number(n.price || ticketPrice), 0)
+        : customerNumbers.length * ticketPrice;
+      const customerTotalPaid = p.customer?.payments
+        ? p.customer.payments.reduce((s, pay) => s + Number(pay.amount), 0)
+        : Number(p.amount);
+      const customerPendingBalance = Math.max(0, customerTotalPurchased - customerTotalPaid);
+
+      return {
+        id: p.id,
+        customerId: p.customerId,
+        customerName: p.customer?.fullName || 'Cliente desconocido',
+        customerPhone: p.customer?.phone || '',
+        customerNumbers,
+        customerTotalPurchased,
+        customerTotalPaid,
+        customerPendingBalance,
+        amount: Number(p.amount),
+        paymentType: p.paymentType,
+        paymentMethod: p.paymentMethod,
+        reference: p.reference,
+        paidAt: p.paidAt.toISOString(),
+        notes: p.notes,
+      };
+    });
 
     return NextResponse.json(formatted);
   } catch (error) {
@@ -152,3 +171,108 @@ export async function POST(request: Request) {
     );
   }
 }
+
+// DELETE: Eliminar un abono o pago registrado
+export async function DELETE(request: Request) {
+  try {
+    const admin = await getCurrentAdmin();
+    if (!admin) {
+      return NextResponse.json(
+        { error: 'Acceso no autorizado. Se requiere sesión activa de administrador.' },
+        { status: 401 }
+      );
+    }
+
+    // Obtener ID desde URL query params o cuerpo JSON
+    const { searchParams } = new URL(request.url);
+    let paymentId = searchParams.get('id');
+
+    if (!paymentId) {
+      try {
+        const body = await request.json();
+        paymentId = body.id;
+      } catch {}
+    }
+
+    if (!paymentId) {
+      return NextResponse.json(
+        { error: 'Debe especificar el ID del abono/pago a eliminar' },
+        { status: 400 }
+      );
+    }
+
+    const result = await prisma.$transaction(async (tx) => {
+      const payment = await tx.payment.findUnique({
+        where: { id: paymentId },
+        include: {
+          customer: {
+            include: {
+              numbers: true,
+              payments: true,
+            },
+          },
+        },
+      });
+
+      if (!payment) {
+        throw new Error('El registro de abono/pago no existe o ya fue eliminado');
+      }
+
+      // Eliminar el registro del abono
+      await tx.payment.delete({
+        where: { id: paymentId },
+      });
+
+      // Recalcular saldo del cliente tras eliminar este abono
+      if (payment.customer) {
+        const customer = payment.customer;
+        const totalCost = customer.numbers.length * 40000;
+        const otherPayments = customer.payments.filter((p) => p.id !== paymentId);
+        const newTotalPaid = otherPayments.reduce((acc, p) => acc + Number(p.amount), 0);
+
+        // Si el cliente tenía números marcados como PAID pero ahora ya no cubre la deuda total:
+        if (newTotalPaid < totalCost && customer.numbers.length > 0) {
+          await tx.raffleNumber.updateMany({
+            where: { customerId: customer.id },
+            data: { status: 'SOLD_PENDING' },
+          });
+
+          await tx.numberAssignment.updateMany({
+            where: { customerId: customer.id },
+            data: { status: 'PENDING' },
+          });
+        }
+      }
+
+      // Registrar auditoría
+      await tx.auditLog.create({
+        data: {
+          action: 'DELETE_PAYMENT',
+          entity: 'payments',
+          entityId: paymentId,
+          performedBy: admin?.username || 'admin',
+          details: `Abono/Pago de $${Number(payment.amount).toLocaleString('es-CO')} eliminado para ${payment.customer?.fullName || 'N/A'}.`,
+        },
+      });
+
+      return payment;
+    });
+
+    notifyRaffleUpdate('PAYMENT_DELETED', {
+      id: paymentId,
+      customerId: result.customerId,
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: 'Abono/pago eliminado correctamente',
+    });
+  } catch (error: any) {
+    console.error('Error al eliminar abono/pago:', error);
+    return NextResponse.json(
+      { error: error.message || 'Error al eliminar el abono' },
+      { status: 400 }
+    );
+  }
+}
+
