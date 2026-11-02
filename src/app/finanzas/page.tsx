@@ -53,7 +53,7 @@ export default function FinancePage() {
       const [resStats, resPayments, resCustomers] = await Promise.all([
         fetch('/api/dashboard/stats', { cache: 'no-store' }),
         fetch('/api/payments', { cache: 'no-store' }),
-        fetch('/api/customers', { cache: 'no-store' }),
+        fetch('/api/customers?minimal=true', { cache: 'no-store' }),
       ]);
 
       if (resStats.ok) {
@@ -79,6 +79,27 @@ export default function FinancePage() {
 
   useEffect(() => {
     loadFinanceData();
+
+    // Sincronización automática periódica cada 5 segundos si la pestaña está activa
+    const interval = setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        loadFinanceData();
+      }
+    }, 5000);
+
+    // Actualizar de inmediato al regresar a la pestaña
+    const handleFocus = () => {
+      loadFinanceData();
+    };
+
+    window.addEventListener('focus', handleFocus);
+    window.addEventListener('visibilitychange', handleFocus);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('visibilitychange', handleFocus);
+    };
   }, [loadFinanceData]);
 
   const filteredPayments = payments.filter((p) => {

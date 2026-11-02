@@ -16,6 +16,19 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const q = searchParams.get('q')?.trim() || '';
     const statusFilter = searchParams.get('status') || 'ALL'; // ALL, PAID, PENDING, PARTIAL
+    const minimal = searchParams.get('minimal') === 'true';
+
+    // Si se solicita versión mínima (solo id y nombre para selectores/combos)
+    if (minimal) {
+      const minimalCustomers = await prisma.customer.findMany({
+        select: {
+          id: true,
+          fullName: true,
+        },
+        orderBy: { fullName: 'asc' },
+      });
+      return NextResponse.json(minimalCustomers);
+    }
 
     // Obtener todos los clientes con sus números y pagos
     const customers = await prisma.customer.findMany({

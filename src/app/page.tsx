@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Image from 'next/image';
 import {
   Sparkles,
@@ -44,6 +44,9 @@ export default function DashboardPage() {
   const [customerModalOpen, setCustomerModalOpen] = useState(false);
   const [initialNumbersForCustomer, setInitialNumbersForCustomer] = useState<string[]>([]);
   const [selectedNumberForDetail, setSelectedNumberForDetail] = useState<RaffleNumberData | null>(null);
+  const selectedNumberRef = useRef<RaffleNumberData | null>(null);
+  selectedNumberRef.current = selectedNumberForDetail;
+
   const [detailModalOpen, setDetailModalOpen] = useState(false);
 
   // Modal de Abono / Pago
@@ -53,7 +56,7 @@ export default function DashboardPage() {
     name: '',
   });
 
-  // Carga de datos
+  // Carga de datos optimizada
   const loadData = useCallback(async () => {
     try {
       const [resStats, resNumbers] = await Promise.all([
@@ -70,56 +73,45 @@ export default function DashboardPage() {
         const numbersData = await resNumbers.json();
         setNumbers(numbersData);
 
-        // Si hay un modal abierto con un número específico, actualizar sus datos
-        if (selectedNumberForDetail) {
+        // Si hay un modal abierto con un número específico, actualizar sus datos sin bucles
+        if (selectedNumberRef.current) {
           const updatedNum = numbersData.find(
-            (n: RaffleNumberData) => n.number === selectedNumberForDetail.number
+            (n: RaffleNumberData) => n.number === selectedNumberRef.current?.number
           );
           if (updatedNum) setSelectedNumberForDetail(updatedNum);
         }
       }
+      setRealtimeConnected(true);
     } catch (error) {
       console.error('Error cargando datos de la rifa:', error);
+      setRealtimeConnected(false);
     } finally {
       setLoading(false);
     }
-  }, [selectedNumberForDetail]);
+  }, []);
 
   useEffect(() => {
     loadData();
 
-    // 1. Conexión en TIEMPO REAL mediante Server-Sent Events (SSE)
-    let eventSource: EventSource | null = null;
-    try {
-      eventSource = new EventSource('/api/realtime');
+    // Sincronización automática de alto rendimiento cada 5 segundos si la página está activa
+    const interval = setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        loadData();
+      }
+    }, 5000);
 
-      eventSource.onopen = () => {
-        setRealtimeConnected(true);
-      };
+    // Refresco inmediato al volver a enfocar la ventana o cambiar de pestaña
+    const handleSync = () => {
+      loadData();
+    };
 
-      eventSource.onmessage = (event) => {
-        try {
-          const payload = JSON.parse(event.data);
-          if (payload.type !== 'CONNECTED') {
-            // Sincronizar inmediatamente al recibir eventos de mutación
-            loadData();
-          }
-        } catch {}
-      };
-
-      eventSource.onerror = () => {
-        setRealtimeConnected(false);
-      };
-    } catch (e) {
-      console.error('Error al inicializar SSE:', e);
-    }
-
-    // 2. Respaldo de sincronización periódica cada 10 segundos
-    const interval = setInterval(loadData, 10000);
+    window.addEventListener('focus', handleSync);
+    window.addEventListener('visibilitychange', handleSync);
 
     return () => {
-      if (eventSource) eventSource.close();
       clearInterval(interval);
+      window.removeEventListener('focus', handleSync);
+      window.removeEventListener('visibilitychange', handleSync);
     };
   }, [loadData]);
 

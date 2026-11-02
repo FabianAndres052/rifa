@@ -149,6 +149,14 @@ export async function PUT(
               },
             });
           }
+        } else if (paymentStatus === 'PENDING' || paymentStatus === 'RESERVED') {
+          // Si pasa a pendiente o reservado, revertir pagos totales para reflejar la realidad en Finanzas
+          await tx.payment.deleteMany({
+            where: {
+              customerId: id,
+              paymentType: 'TOTAL',
+            },
+          });
         }
       }
 

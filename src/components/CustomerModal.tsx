@@ -24,7 +24,7 @@ export default function CustomerModal({
   const [address, setAddress] = useState('');
   const [selectedNumbers, setSelectedNumbers] = useState<string[]>([]);
   const [manualNumberInput, setManualNumberInput] = useState('');
-  const [paymentStatus, setPaymentStatus] = useState<'SOLD_PAID' | 'SOLD_PENDING' | 'RESERVED'>('SOLD_PAID');
+  const [paymentStatus, setPaymentStatus] = useState<'SOLD_PAID' | 'SOLD_PENDING' | 'RESERVED'>('SOLD_PENDING');
   const [paymentMethod, setPaymentMethod] = useState('EFECTIVO');
   const [paymentReference, setPaymentReference] = useState('');
   const [notes, setNotes] = useState('');

@@ -36,6 +36,25 @@ export async function PATCH(
 
       // Si se libera a AVAILABLE
       if (status === 'AVAILABLE') {
+        // Si antes estaba PAGADO, revertir pago asociado
+        if (existing.status === 'SOLD_PAID' && existing.customerId) {
+          const associatedPayment = await tx.payment.findFirst({
+            where: {
+              customerId: existing.customerId,
+              OR: [
+                { notes: { contains: numStr } },
+                { paymentType: 'TOTAL' },
+              ],
+            },
+            orderBy: { paidAt: 'desc' },
+          });
+          if (associatedPayment) {
+            await tx.payment.delete({
+              where: { id: associatedPayment.id },
+            });
+          }
+        }
+
         // Eliminar asignación
         if (existing.assignment) {
           await tx.numberAssignment.delete({
@@ -107,6 +126,26 @@ export async function PATCH(
       }
 
       // Si se marca como RESERVED o SOLD_PENDING
+      // Si antes estaba PAGADO, revertir el pago asociado para mantener Finanzas sincronizado
+      if (existing.status === 'SOLD_PAID' && existing.customerId) {
+        const associatedPayment = await tx.payment.findFirst({
+          where: {
+            customerId: existing.customerId,
+            OR: [
+              { notes: { contains: numStr } },
+              { paymentType: 'TOTAL' },
+            ],
+          },
+          orderBy: { paidAt: 'desc' },
+        });
+
+        if (associatedPayment) {
+          await tx.payment.delete({
+            where: { id: associatedPayment.id },
+          });
+        }
+      }
+
       const assignmentStatus = status === 'RESERVED' ? 'RESERVED' : 'PENDING';
 
       const updated = await tx.raffleNumber.update({

@@ -4,60 +4,66 @@ import { prisma } from '@/lib/prisma';
 export async function GET() {
   try {
     const [
-      numbers,
-      customers,
+      statusGroups,
+      totalCustomersCount,
+      customersWithNumbers,
       paymentsSum,
     ] = await Promise.all([
-      prisma.raffleNumber.findMany({
-        select: {
-          number: true,
-          status: true,
-          price: true,
-        },
+      // 1. Conteo agrupado rápido de números por estado
+      prisma.raffleNumber.groupBy({
+        by: ['status'],
+        _count: { number: true },
       }),
+      // 2. Conteo total de clientes
+      prisma.customer.count(),
+      // 3. Clientes con números asignados (solo campos estrictamente necesarios)
       prisma.customer.findMany({
-        include: {
-          numbers: true,
-          payments: true,
+        where: { numbers: { some: {} } },
+        select: {
+          id: true,
+          numbers: { select: { price: true } },
+          payments: { select: { amount: true } },
         },
       }),
+      // 4. Suma exacta de dinero recaudado en la tabla de pagos
       prisma.payment.aggregate({
-        _sum: {
-          amount: true,
-        },
+        _sum: { amount: true },
       }),
     ]);
 
     const totalNumbers = 100;
+    const ticketPrice = 40000;
+    const totalPotentialRevenue = totalNumbers * ticketPrice; // $4.000.000 COP
+
     let availableNumbers = 0;
     let reservedNumbers = 0;
     let paidNumbers = 0;
     let pendingNumbers = 0;
 
-    for (const num of numbers) {
-      if (num.status === 'AVAILABLE') availableNumbers++;
-      else if (num.status === 'RESERVED') reservedNumbers++;
-      else if (num.status === 'SOLD_PAID') paidNumbers++;
-      else if (num.status === 'SOLD_PENDING') pendingNumbers++;
+    for (const group of statusGroups) {
+      const count = group._count.number;
+      if (group.status === 'AVAILABLE') availableNumbers = count;
+      else if (group.status === 'RESERVED') reservedNumbers = count;
+      else if (group.status === 'SOLD_PAID') paidNumbers = count;
+      else if (group.status === 'SOLD_PENDING') pendingNumbers = count;
     }
 
     const soldNumbers = paidNumbers + pendingNumbers;
-    const ticketPrice = 40000;
-    const totalPotentialRevenue = totalNumbers * ticketPrice; // $4,000,000 COP
 
-    // Dinero efectivamente recaudado (suma de todos los pagos registrados en payments)
-    const totalCollected = paymentsSum._sum.amount
-      ? Number(paymentsSum._sum.amount)
-      : paidNumbers * ticketPrice;
+    // Dinero efectivamente recaudado (suma real y confirmada de pagos/abonos en payments)
+    const totalCollected = Number(paymentsSum._sum.amount || 0);
 
-    // Dinero pendiente de recaudar: valor de los números vendidos pendientes
-    const totalPending = pendingNumbers * ticketPrice;
+    // Valor total de los números vendidos
+    const totalSoldValue = soldNumbers * ticketPrice;
 
-    // Conteo de clientes según estado de pago
+    // Dinero pendiente por cobrar (valor total vendido menos lo efectivamente recaudado)
+    const totalPending = Math.max(0, totalSoldValue - totalCollected);
+
+    // Conteo exacto de clientes según estado de pago
     let paidCustomersCount = 0;
     let pendingCustomersCount = 0;
 
-    for (const customer of customers) {
+    for (const customer of customersWithNumbers) {
       const customerCost = customer.numbers.reduce(
         (sum, n) => sum + Number(n.price || ticketPrice),
         0
@@ -84,7 +90,7 @@ export async function GET() {
       totalCollected,
       totalPending,
       totalPotentialRevenue,
-      totalCustomers: customers.length,
+      totalCustomers: totalCustomersCount,
       paidCustomersCount,
       pendingCustomersCount,
     });
@@ -96,3 +102,4 @@ export async function GET() {
     );
   }
 }
+
