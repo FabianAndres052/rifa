@@ -32,7 +32,12 @@ export default function CustomersPage() {
   // Modales
   const [customerModalOpen, setCustomerModalOpen] = useState(false);
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
-  const [activeCustomerForPayment, setActiveCustomerForPayment] = useState<{ id: string; name: string }>({
+  const [activeCustomerForPayment, setActiveCustomerForPayment] = useState<{
+    id: string;
+    name: string;
+    pendingBalance?: number;
+    totalPaid?: number;
+  }>({
     id: '',
     name: '',
   });
@@ -299,7 +304,12 @@ export default function CustomersPage() {
                         <button
                           type="button"
                           onClick={() => {
-                            setActiveCustomerForPayment({ id: c.id, name: c.fullName });
+                            setActiveCustomerForPayment({
+                              id: c.id,
+                              name: c.fullName,
+                              pendingBalance: c.pendingBalance,
+                              totalPaid: c.totalPaid,
+                            });
                             setPaymentModalOpen(true);
                           }}
                           title="Registrar Abono"
@@ -354,6 +364,8 @@ export default function CustomersPage() {
         onClose={() => setPaymentModalOpen(false)}
         customerId={activeCustomerForPayment.id}
         customerName={activeCustomerForPayment.name}
+        pendingBalance={activeCustomerForPayment.pendingBalance}
+        totalPaid={activeCustomerForPayment.totalPaid}
         onSuccess={fetchCustomers}
       />
 

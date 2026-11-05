@@ -106,11 +106,38 @@ export async function POST(request: Request) {
         throw new Error('El cliente no existe');
       }
 
-      // Crear el registro de pago
+      // Calcular deuda total y saldo ya pagado
+      const totalCost = customer.numbers.reduce(
+        (acc, n) => acc + Number(n.price || 40000),
+        0
+      );
+      const alreadyPaid = customer.payments.reduce(
+        (acc, p) => acc + Number(p.amount),
+        0
+      );
+      const pendingBalance = Math.max(0, totalCost - alreadyPaid);
+
+      if (pendingBalance <= 0) {
+        throw new Error(
+          `El cliente ${customer.fullName} ya tiene todos sus números 100% cancelados ($${alreadyPaid.toLocaleString('es-CO')} COP pagados). Saldo pendiente: $0.`
+        );
+      }
+
+      // Si el pago es TOTAL o excede la deuda restante, asegurar que no sume de más
+      let finalAmount = numericAmount;
+      if (paymentType === 'TOTAL' && finalAmount > pendingBalance) {
+        finalAmount = pendingBalance;
+      } else if (finalAmount > pendingBalance) {
+        throw new Error(
+          `El monto ingresado ($${finalAmount.toLocaleString('es-CO')} COP) supera el saldo pendiente del cliente ($${pendingBalance.toLocaleString('es-CO')} COP).`
+        );
+      }
+
+      // Crear el registro de pago con el monto verificado
       const newPayment = await tx.payment.create({
         data: {
           customerId,
-          amount: numericAmount,
+          amount: finalAmount,
           paymentType,
           paymentMethod,
           reference: reference?.trim() || null,
@@ -118,15 +145,9 @@ export async function POST(request: Request) {
         },
       });
 
-      // Calcular si con este abono se completa el pago de todos sus números
-      const totalCost = customer.numbers.length * 40000;
-      const alreadyPaid = customer.payments.reduce(
-        (acc, p) => acc + Number(p.amount),
-        0
-      );
-      const newTotalPaid = alreadyPaid + numericAmount;
+      const newTotalPaid = alreadyPaid + finalAmount;
 
-      // Si completó o superó la deuda total, marcar los números como SOLD_PAID
+      // Si completó la deuda total, marcar los números como SOLD_PAID
       if (newTotalPaid >= totalCost && customer.numbers.length > 0) {
         await tx.raffleNumber.updateMany({
           where: { customerId },
@@ -146,7 +167,7 @@ export async function POST(request: Request) {
           entity: 'payments',
           entityId: newPayment.id,
           performedBy: admin?.username || 'admin',
-          details: `Abono/Pago registrado por $${numericAmount.toLocaleString('es-CO')} COP para ${customer.fullName}. Método: ${paymentMethod}`,
+          details: `Abono/Pago registrado por $${finalAmount.toLocaleString('es-CO')} COP para ${customer.fullName}. Método: ${paymentMethod}`,
         },
       });
 
@@ -155,7 +176,7 @@ export async function POST(request: Request) {
 
     notifyRaffleUpdate('PAYMENT_RECORDED', {
       customerId,
-      amount: numericAmount,
+      amount: result.amount,
     });
 
     return NextResponse.json({
@@ -226,7 +247,10 @@ export async function DELETE(request: Request) {
       // Recalcular saldo del cliente tras eliminar este abono
       if (payment.customer) {
         const customer = payment.customer;
-        const totalCost = customer.numbers.length * 40000;
+        const totalCost = customer.numbers.reduce(
+          (acc, n) => acc + Number(n.price || 40000),
+          0
+        );
         const otherPayments = customer.payments.filter((p) => p.id !== paymentId);
         const newTotalPaid = otherPayments.reduce((acc, p) => acc + Number(p.amount), 0);
 

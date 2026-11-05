@@ -36,22 +36,37 @@ export async function PATCH(
 
       // Si se libera a AVAILABLE
       if (status === 'AVAILABLE') {
-        // Si antes estaba PAGADO, revertir pago asociado
-        if (existing.status === 'SOLD_PAID' && existing.customerId) {
-          const associatedPayment = await tx.payment.findFirst({
+        // Revertir pagos asociados si tenía cliente
+        if (existing.customerId) {
+          const otherNumbersCount = await tx.raffleNumber.count({
             where: {
               customerId: existing.customerId,
-              OR: [
-                { notes: { contains: numStr } },
-                { paymentType: 'TOTAL' },
-              ],
+              number: { not: numStr },
             },
-            orderBy: { paidAt: 'desc' },
           });
-          if (associatedPayment) {
-            await tx.payment.delete({
-              where: { id: associatedPayment.id },
+
+          if (otherNumbersCount === 0) {
+            // Si era el único número del cliente, eliminar todos sus pagos registrados
+            await tx.payment.deleteMany({
+              where: { customerId: existing.customerId },
             });
+          } else {
+            // Si tiene otros números, eliminar el pago asociado a este número específico si existe
+            const associatedPayment = await tx.payment.findFirst({
+              where: {
+                customerId: existing.customerId,
+                OR: [
+                  { notes: { contains: numStr } },
+                  { paymentType: 'TOTAL' },
+                ],
+              },
+              orderBy: { paidAt: 'desc' },
+            });
+            if (associatedPayment) {
+              await tx.payment.delete({
+                where: { id: associatedPayment.id },
+              });
+            }
           }
         }
 
@@ -99,17 +114,62 @@ export async function PATCH(
           });
         }
 
-        // Si antes estaba pendiente o reservado y tiene cliente, registrar pago
+        let amountToPay = 0;
+
+        // Si antes estaba pendiente o reservado y tiene cliente, registrar ÚNICAMENTE el saldo pendiente
+        // evitando duplicar o sumar abonos previos con el valor total
         if (existing.customerId && existing.status !== 'SOLD_PAID') {
-          await tx.payment.create({
-            data: {
-              customerId: existing.customerId,
-              amount: 40000.0,
-              paymentType: 'TOTAL',
-              paymentMethod,
-              notes: notes || `Pago confirmado para el número ${numStr}`,
+          const customer = await tx.customer.findUnique({
+            where: { id: existing.customerId },
+            include: {
+              numbers: true,
+              payments: true,
             },
           });
+
+          if (customer) {
+            const ticketPrice = Number(existing.price || 40000);
+            const totalCost = customer.numbers.reduce(
+              (sum, n) => sum + Number(n.price || ticketPrice),
+              0
+            );
+            const alreadyPaid = customer.payments.reduce(
+              (sum, p) => sum + Number(p.amount),
+              0
+            );
+            const pendingBalance = Math.max(0, totalCost - alreadyPaid);
+
+            // El monto a pagar es estrictamente el saldo restante de la deuda, máximo el valor del boleto
+            amountToPay = Math.min(ticketPrice, pendingBalance);
+
+            if (amountToPay > 0) {
+              await tx.payment.create({
+                data: {
+                  customerId: existing.customerId,
+                  amount: amountToPay,
+                  paymentType: 'TOTAL',
+                  paymentMethod,
+                  notes:
+                    notes ||
+                    (pendingBalance < ticketPrice
+                      ? `Liquidación de saldo pendiente ($${amountToPay.toLocaleString('es-CO')} COP) para el número ${numStr}`
+                      : `Pago confirmado para el número ${numStr}`),
+                },
+              });
+            }
+
+            // Si con esto el cliente cubre la totalidad de sus números, asegurar que todos queden en SOLD_PAID
+            if (alreadyPaid + amountToPay >= totalCost) {
+              await tx.raffleNumber.updateMany({
+                where: { customerId: customer.id },
+                data: { status: 'SOLD_PAID' },
+              });
+              await tx.numberAssignment.updateMany({
+                where: { customerId: customer.id },
+                data: { status: 'PAID' },
+              });
+            }
+          }
         }
 
         await tx.auditLog.create({
@@ -118,7 +178,9 @@ export async function PATCH(
             entity: 'raffle_numbers',
             entityId: numStr,
             performedBy: admin?.username || 'admin',
-            details: `El número ${numStr} fue marcado como PAGADO para el cliente ${existing.customer?.fullName || 'N/A'}`,
+            details: `El número ${numStr} fue marcado como PAGADO para el cliente ${
+              existing.customer?.fullName || 'N/A'
+            }${amountToPay > 0 ? `. Pago liquidado: $${amountToPay.toLocaleString('es-CO')} COP` : ' (ya completado con abonos previos)'}`,
           },
         });
 

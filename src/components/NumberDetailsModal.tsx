@@ -21,7 +21,12 @@ interface NumberDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAssignCustomer: (num: string) => void;
-  onOpenPaymentModal: (customerId: string, customerName: string) => void;
+  onOpenPaymentModal: (
+    customerId: string,
+    customerName: string,
+    pendingBalance?: number,
+    totalPaid?: number
+  ) => void;
   onRefresh: () => void;
 }
 
@@ -258,7 +263,11 @@ export default function NumberDetailsModal({
                     className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white transition-colors cursor-pointer"
                   >
                     <CheckCircle2 className="w-4 h-4" />
-                    <span>Marcar como PAGADO</span>
+                    <span>
+                      {numberData.hasAbono
+                        ? `Completar Pago ($${(numberData.pendingBalance ?? numberData.customer?.pendingBalance ?? 40000).toLocaleString('es-CO')})`
+                        : 'Marcar como PAGADO'}
+                    </span>
                   </button>
                 )}
 
@@ -267,7 +276,12 @@ export default function NumberDetailsModal({
                     type="button"
                     onClick={() => {
                       onClose();
-                      onOpenPaymentModal(numberData.customer!.id, numberData.customer!.fullName);
+                      onOpenPaymentModal(
+                        numberData.customer!.id,
+                        numberData.customer!.fullName,
+                        numberData.pendingBalance ?? numberData.customer!.pendingBalance,
+                        numberData.totalPaid ?? numberData.customer!.totalPaid
+                      );
                     }}
                     className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-semibold bg-zinc-800 hover:bg-zinc-700 text-zinc-100 border border-zinc-700 transition-colors cursor-pointer"
                   >

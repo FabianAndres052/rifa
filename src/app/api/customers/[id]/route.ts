@@ -130,7 +130,10 @@ export async function PUT(
 
         // Si se cambia a PAID y no había pagado, registrar el pago restante
         if (paymentStatus === 'PAID') {
-          const totalCost = existing.numbers.length * 40000;
+          const totalCost = existing.numbers.reduce(
+            (sum, n) => sum + Number(n.price || 40000),
+            0
+          );
           const currentPayments = await tx.payment.aggregate({
             where: { customerId: id },
             _sum: { amount: true },

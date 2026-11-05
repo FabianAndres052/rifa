@@ -38,18 +38,28 @@ export default function PaymentModal({
   // Sincronizar monto sugerido si cambia pendingBalance al abrir
   React.useEffect(() => {
     if (isOpen) {
-      if (pendingBalance && pendingBalance > 0) {
+      if (pendingBalance !== undefined && pendingBalance > 0) {
         setAmount(pendingBalance.toString());
-        setPaymentType('ABONO');
+        setPaymentType(totalPaid && totalPaid > 0 ? 'TOTAL' : 'ABONO');
+      } else if (pendingBalance === 0) {
+        setAmount('0');
+        setPaymentType('TOTAL');
       } else {
         setAmount('40000');
         setPaymentType('TOTAL');
       }
       setError(null);
     }
-  }, [isOpen, pendingBalance]);
+  }, [isOpen, pendingBalance, totalPaid]);
 
   if (!isOpen) return null;
+
+  const handlePaymentTypeChange = (newType: 'ABONO' | 'TOTAL') => {
+    setPaymentType(newType);
+    if (newType === 'TOTAL' && pendingBalance !== undefined && pendingBalance > 0) {
+      setAmount(pendingBalance.toString());
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,6 +68,18 @@ export default function PaymentModal({
     const numAmount = parseFloat(amount);
     if (isNaN(numAmount) || numAmount <= 0) {
       setError('Ingrese un monto válido mayor a 0');
+      return;
+    }
+
+    if (pendingBalance !== undefined && pendingBalance > 0 && numAmount > pendingBalance) {
+      setError(
+        `El monto ($${numAmount.toLocaleString('es-CO')} COP) supera el saldo pendiente del cliente ($${pendingBalance.toLocaleString('es-CO')} COP). Para no duplicar cobros, ingrese como máximo el saldo adeudado.`
+      );
+      return;
+    }
+
+    if (pendingBalance === 0) {
+      setError('Este cliente ya canceló el 100% del valor de sus números.');
       return;
     }
 
@@ -150,9 +172,23 @@ export default function PaymentModal({
           )}
 
           <div>
-            <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1.5">
-              Monto del Pago ($ COP) *
-            </label>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider">
+                Monto del Pago ($ COP) *
+              </label>
+              {pendingBalance !== undefined && pendingBalance > 0 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAmount(pendingBalance.toString());
+                    setPaymentType('TOTAL');
+                  }}
+                  className="text-[11px] font-semibold text-emerald-400 hover:text-emerald-300 underline cursor-pointer"
+                >
+                  Liquidar saldo (${pendingBalance.toLocaleString('es-CO')})
+                </button>
+              )}
+            </div>
             <div className="relative">
               <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400 font-bold">$</span>
               <input
@@ -174,11 +210,11 @@ export default function PaymentModal({
               </label>
               <select
                 value={paymentType}
-                onChange={(e) => setPaymentType(e.target.value as any)}
+                onChange={(e) => handlePaymentTypeChange(e.target.value as any)}
                 className="w-full px-3 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-100 text-xs font-medium focus:outline-none focus:border-zinc-500"
               >
                 <option value="ABONO">Abono Parcial</option>
-                <option value="TOTAL">Pago Completo</option>
+                <option value="TOTAL">Pago Completo (Liquidar)</option>
               </select>
             </div>
 

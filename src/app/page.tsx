@@ -51,7 +51,12 @@ export default function DashboardPage() {
 
   // Modal de Abono / Pago
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
-  const [paymentCustomerInfo, setPaymentCustomerInfo] = useState<{ id: string; name: string }>({
+  const [paymentCustomerInfo, setPaymentCustomerInfo] = useState<{
+    id: string;
+    name: string;
+    pendingBalance?: number;
+    totalPaid?: number;
+  }>({
     id: '',
     name: '',
   });
@@ -134,8 +139,18 @@ export default function DashboardPage() {
   };
 
   // Abrir modal de abono
-  const handleOpenPaymentModal = (customerId: string, customerName: string) => {
-    setPaymentCustomerInfo({ id: customerId, name: customerName });
+  const handleOpenPaymentModal = (
+    customerId: string,
+    customerName: string,
+    pendingBalance?: number,
+    totalPaid?: number
+  ) => {
+    setPaymentCustomerInfo({
+      id: customerId,
+      name: customerName,
+      pendingBalance,
+      totalPaid,
+    });
     setPaymentModalOpen(true);
   };
 
@@ -264,6 +279,8 @@ export default function DashboardPage() {
         onClose={() => setPaymentModalOpen(false)}
         customerId={paymentCustomerInfo.id}
         customerName={paymentCustomerInfo.name}
+        pendingBalance={paymentCustomerInfo.pendingBalance}
+        totalPaid={paymentCustomerInfo.totalPaid}
         onSuccess={loadData}
       />
     </div>
