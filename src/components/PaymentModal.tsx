@@ -99,25 +99,25 @@ export default function PaymentModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-      <div className="relative w-full max-w-md bg-slate-900 border border-slate-700/80 rounded-2xl shadow-2xl overflow-hidden">
+      <div className="relative w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl overflow-hidden">
         {/* Cabecera */}
-        <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-amber-950 via-slate-900 to-slate-900 border-b border-amber-900/40">
+        <div className="flex items-center justify-between px-6 py-4 bg-zinc-950 border-b border-zinc-800">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-amber-600/30 border border-amber-500/40 text-amber-300">
+            <div className="p-2 rounded-xl bg-zinc-800 border border-zinc-700/60 text-zinc-300">
               <DollarSign className="w-5 h-5" />
             </div>
             <div>
               <h3 className="text-base font-bold text-white tracking-tight">
                 Registrar Abono / Pago
               </h3>
-              <p className="text-xs text-amber-300/80 font-medium">
-                Cliente: {customerName}
+              <p className="text-xs text-zinc-400 font-medium">
+                Cliente: <span className="text-zinc-200">{customerName}</span>
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -133,16 +133,16 @@ export default function PaymentModal({
           )}
 
           {(totalPaid !== undefined || pendingBalance !== undefined) && (
-            <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 grid grid-cols-2 gap-2 text-xs">
-              <div className="p-2 rounded-lg bg-emerald-950/40 border border-emerald-900/40">
-                <span className="block text-[10px] text-emerald-400 font-bold uppercase">Ya Abonó</span>
-                <span className="font-mono font-bold text-emerald-300 text-sm">
+            <div className="p-3 rounded-xl bg-zinc-950 border border-zinc-800 grid grid-cols-2 gap-2 text-xs">
+              <div className="p-2 rounded-lg bg-zinc-900 border border-zinc-800">
+                <span className="block text-[10px] text-zinc-400 font-semibold uppercase">Ya Abonó</span>
+                <span className="font-mono font-bold text-emerald-400 text-sm">
                   ${(totalPaid || 0).toLocaleString('es-CO')} COP
                 </span>
               </div>
-              <div className="p-2 rounded-lg bg-amber-950/40 border border-amber-900/40">
-                <span className="block text-[10px] text-amber-400 font-bold uppercase">Resta por Pagar (Debe)</span>
-                <span className="font-mono font-black text-amber-300 text-sm">
+              <div className="p-2 rounded-lg bg-zinc-900 border border-zinc-800">
+                <span className="block text-[10px] text-zinc-400 font-semibold uppercase">Resta por Pagar (Debe)</span>
+                <span className="font-mono font-bold text-amber-400 text-sm">
                   ${(pendingBalance || 0).toLocaleString('es-CO')} COP
                 </span>
               </div>
@@ -150,11 +150,11 @@ export default function PaymentModal({
           )}
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1.5">
               Monto del Pago ($ COP) *
             </label>
             <div className="relative">
-              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold">$</span>
+              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400 font-bold">$</span>
               <input
                 type="number"
                 step="1000"
@@ -162,20 +162,20 @@ export default function PaymentModal({
                 required
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                className="w-full pl-8 pr-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white font-mono font-bold text-base focus:outline-none focus:border-amber-500"
+                className="w-full pl-8 pr-3.5 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-100 font-mono font-bold text-base focus:outline-none focus:border-zinc-500"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1.5">
                 Tipo de Pago
               </label>
               <select
                 value={paymentType}
                 onChange={(e) => setPaymentType(e.target.value as any)}
-                className="w-full px-3 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs font-medium focus:outline-none focus:border-amber-500"
+                className="w-full px-3 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-100 text-xs font-medium focus:outline-none focus:border-zinc-500"
               >
                 <option value="ABONO">Abono Parcial</option>
                 <option value="TOTAL">Pago Completo</option>
@@ -183,13 +183,13 @@ export default function PaymentModal({
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1.5">
                 Método
               </label>
               <select
                 value={paymentMethod}
                 onChange={(e) => setPaymentMethod(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs font-medium focus:outline-none focus:border-amber-500"
+                className="w-full px-3 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-100 text-xs font-medium focus:outline-none focus:border-zinc-500"
               >
                 <option value="EFECTIVO">Efectivo</option>
                 <option value="NEQUI">Nequi</option>
@@ -201,7 +201,7 @@ export default function PaymentModal({
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1.5">
               Referencia / Comprobante (Opcional)
             </label>
             <input
@@ -209,12 +209,12 @@ export default function PaymentModal({
               value={reference}
               onChange={(e) => setReference(e.target.value)}
               placeholder="Ej: Aprobación #83921"
-              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs placeholder-slate-500 focus:outline-none focus:border-amber-500"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-100 text-xs placeholder-zinc-500 focus:outline-none focus:border-zinc-500"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1.5">
               Notas adicionales
             </label>
             <textarea
@@ -222,23 +222,23 @@ export default function PaymentModal({
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Detalles sobre el pago..."
-              className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs placeholder-slate-500 focus:outline-none focus:border-amber-500 resize-none"
+              className="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-100 text-xs placeholder-zinc-500 focus:outline-none focus:border-zinc-500 resize-none"
             />
           </div>
 
-          <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-800">
+          <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-zinc-800">
             <button
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="px-4 py-2 rounded-xl text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800"
+              className="px-4 py-2 rounded-xl text-xs font-medium text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors cursor-pointer"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-amber-600 to-yellow-500 text-slate-950 hover:opacity-95 shadow-lg shadow-amber-600/30 transition-all cursor-pointer font-bold"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold bg-zinc-100 hover:bg-white text-zinc-950 shadow-sm transition-all cursor-pointer font-bold"
             >
               <CheckCircle className="w-4 h-4" />
               <span>{loading ? 'Guardando...' : 'Confirmar Abono'}</span>

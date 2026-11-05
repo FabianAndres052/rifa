@@ -75,24 +75,24 @@ export default function DrawsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100">
+    <div className="min-h-screen bg-zinc-950 text-zinc-100">
       <Header />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         {/* Cabecera */}
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight flex items-center gap-3">
-            <Trophy className="w-8 h-8 text-amber-400" />
-            <span>Sorteos Oficiales & Oportunidades de Ganar</span>
+          <h1 className="text-2xl sm:text-3xl font-bold text-zinc-100 tracking-tight flex items-center gap-3">
+            <Trophy className="w-7 h-7 text-zinc-400" />
+            <span>Sorteos Oficiales & Premios</span>
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400 mt-1">
-            Cada cliente juega con el mismo número en los 4 sorteos oficiales de la Lotería Sinuano Noche.
+          <p className="text-xs sm:text-sm text-zinc-400 mt-1">
+            Cada número juega simultáneamente en los 4 sorteos oficiales con la Lotería Sinuano Noche.
           </p>
         </div>
 
         {/* Banner Promocional con Imagen */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-1 relative rounded-3xl overflow-hidden border border-red-900/40 shadow-2xl bg-black">
+          <div className="lg:col-span-1 relative rounded-2xl overflow-hidden border border-zinc-800 shadow-sm bg-zinc-900/50">
             <div className="relative aspect-[3/4] w-full">
               <Image
                 src="/images/carton-promo.jpg"
@@ -110,41 +110,41 @@ export default function DrawsPage() {
                 key={draw.id}
                 className={`p-5 rounded-2xl border transition-all ${
                   draw.isMain
-                    ? 'bg-gradient-to-r from-red-950/80 via-slate-900 to-amber-950/60 border-amber-500/50 shadow-xl ring-1 ring-amber-500/20'
-                    : 'bg-slate-900/90 border-slate-800 shadow-lg'
+                    ? 'bg-zinc-900/80 border-zinc-700/80 shadow-md ring-1 ring-zinc-700/40'
+                    : 'bg-zinc-900/40 border-zinc-800/80 shadow-sm'
                 }`}
               >
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div className="space-y-1">
+                  <div className="space-y-1.5">
                     <div className="flex items-center gap-2">
                       {draw.isMain ? (
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-gradient-to-r from-red-600 to-amber-500 text-white shadow-sm">
-                          GRAN SORTEO MAYOR
+                        <span className="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-zinc-100 text-zinc-950 uppercase tracking-wider">
+                          Gran Sorteo Mayor
                         </span>
                       ) : (
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-950 text-amber-300 border border-amber-800/40">
-                          OPORTUNIDAD ADICIONAL
+                        <span className="px-2.5 py-0.5 rounded-md text-[10px] font-semibold bg-zinc-800 text-zinc-300 border border-zinc-700/60 uppercase tracking-wider">
+                          Oportunidad Adicional
                         </span>
                       )}
-                      <span className="text-xs text-slate-400 font-semibold">
+                      <span className="text-xs text-zinc-400 font-medium">
                         {draw.lottery}
                       </span>
                     </div>
 
-                    <h3 className="text-lg font-black text-white tracking-tight">
+                    <h3 className="text-lg font-bold text-zinc-100 tracking-tight">
                       {draw.title}
                     </h3>
 
-                    <div className="flex items-center gap-2 text-emerald-400 font-extrabold text-base sm:text-lg">
-                      <Gift className="w-5 h-5 text-amber-400" />
+                    <div className="flex items-center gap-2 text-zinc-200 font-semibold text-base sm:text-lg">
+                      <Gift className="w-4 h-4 text-zinc-400" />
                       <span>{draw.prize}</span>
                     </div>
 
-                    <div className="flex items-center gap-2 text-xs text-slate-300">
-                      <Calendar className="w-4 h-4 text-slate-400" />
+                    <div className="flex items-center gap-2 text-xs text-zinc-400">
+                      <Calendar className="w-3.5 h-3.5 text-zinc-500" />
                       <span>
                         Fecha Oficial:{' '}
-                        <strong>
+                        <strong className="text-zinc-200 font-medium">
                           {new Date(draw.drawDate).toLocaleDateString('es-CO', {
                             weekday: 'long',
                             year: 'numeric',
@@ -157,8 +157,8 @@ export default function DrawsPage() {
                   </div>
 
                   {/* Número Ganador y Registro */}
-                  <div className="flex flex-col items-end justify-center min-w-[140px]">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+                  <div className="flex flex-col sm:items-end justify-center min-w-[140px]">
+                    <span className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-1">
                       Número Ganador
                     </span>
 
@@ -170,13 +170,13 @@ export default function DrawsPage() {
                           value={winningInput}
                           onChange={(e) => setWinningInput(e.target.value)}
                           placeholder="00-99"
-                          className="w-16 px-2 py-1 text-center font-mono font-bold text-lg rounded-lg bg-slate-950 border border-amber-500 text-white"
+                          className="w-16 px-2 py-1 text-center font-mono font-bold text-lg rounded-lg bg-zinc-950 border border-zinc-700 text-zinc-100 focus:outline-none focus:border-zinc-500"
                         />
                         <button
                           type="button"
                           disabled={saving}
                           onClick={() => handleSaveWinner(draw.id)}
-                          className="px-3 py-1 rounded-lg text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 cursor-pointer"
+                          className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-zinc-100 text-zinc-950 hover:bg-white transition-colors cursor-pointer disabled:opacity-50"
                         >
                           Guardar
                         </button>
@@ -185,7 +185,7 @@ export default function DrawsPage() {
                       <div className="flex items-center gap-2">
                         {draw.winningNumber ? (
                           <div className="flex items-center gap-2">
-                            <span className="px-4 py-1.5 rounded-xl bg-gradient-to-r from-red-600 to-amber-600 text-white font-mono text-2xl font-black shadow-lg">
+                            <span className="px-3.5 py-1 rounded-xl bg-zinc-800 text-zinc-100 border border-zinc-700/80 font-mono text-xl font-bold shadow-sm">
                               #{draw.winningNumber}
                             </span>
                             <button
@@ -193,7 +193,8 @@ export default function DrawsPage() {
                                 setEditingDrawId(draw.id);
                                 setWinningInput(draw.winningNumber || '');
                               }}
-                              className="p-1.5 text-slate-400 hover:text-white"
+                              className="p-1.5 text-zinc-400 hover:text-zinc-200 transition-colors cursor-pointer"
+                              title="Editar número ganador"
                             >
                               <Edit2 className="w-3.5 h-3.5" />
                             </button>
@@ -205,7 +206,7 @@ export default function DrawsPage() {
                               setEditingDrawId(draw.id);
                               setWinningInput('');
                             }}
-                            className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 cursor-pointer"
+                            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 transition-colors cursor-pointer"
                           >
                             Registrar Ganador
                           </button>

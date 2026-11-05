@@ -153,18 +153,18 @@ export default function FinancePage() {
   });
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100">
+    <div className="min-h-screen bg-zinc-950 text-zinc-100">
       <Header />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         {/* Cabecera */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-black text-white tracking-tight flex items-center gap-2">
-              <DollarSign className="w-6 h-6 text-emerald-400" />
+            <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-2.5">
+              <DollarSign className="w-5 h-5 text-zinc-400" />
               <span>Control Financiero & Historial de Abonos</span>
             </h1>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-zinc-400 mt-0.5">
               Seguimiento exacto de recaudos, abonos parciales, cuentas por cobrar y métodos de pago.
             </p>
           </div>
@@ -172,7 +172,7 @@ export default function FinancePage() {
           {customers.length > 0 && (
             <div className="flex flex-wrap items-center gap-2">
               <select
-                className="px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white"
+                className="px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs text-white focus:outline-none focus:border-zinc-600"
                 onChange={(e) => {
                   const cust = customers.find((c) => c.id === e.target.value);
                   if (cust) {
@@ -201,24 +201,24 @@ export default function FinancePage() {
                 const selectedCust = customers.find((c) => c.id === selectedCustomerId);
                 if (!selectedCust) return null;
                 return (
-                  <div className="hidden sm:flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs">
+                  <div className="hidden sm:flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-zinc-900 border border-zinc-800 text-xs">
                     {selectedCust.numbers && selectedCust.numbers.length > 0 && (
-                      <span className="text-slate-400">
+                      <span className="text-zinc-400">
                         Núm:{' '}
-                        <span className="font-mono font-bold text-amber-300">
+                        <span className="font-mono font-semibold text-zinc-200">
                           {selectedCust.numbers.map((n) => `#${n}`).join(', ')}
                         </span>
                       </span>
                     )}
-                    <span className="text-slate-400">
+                    <span className="text-zinc-400">
                       Abonó:{' '}
                       <span className="font-mono font-bold text-emerald-400">
                         ${(selectedCust.totalPaid || 0).toLocaleString('es-CO')}
                       </span>
                     </span>
-                    <span className="text-slate-400">
+                    <span className="text-zinc-400">
                       Debe:{' '}
-                      <span className="font-mono font-black text-amber-300">
+                      <span className="font-mono font-bold text-amber-400">
                         ${(selectedCust.pendingBalance || 0).toLocaleString('es-CO')} COP
                       </span>
                     </span>
@@ -230,7 +230,7 @@ export default function FinancePage() {
                 type="button"
                 disabled={!selectedCustomerId}
                 onClick={() => setPaymentModalOpen(true)}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-amber-600 text-white hover:bg-amber-500 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-zinc-100 hover:bg-white text-zinc-950 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
                 <span>Registrar Abono</span>
@@ -241,157 +241,157 @@ export default function FinancePage() {
 
         {/* Tarjetas Financieras */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="p-5 rounded-2xl bg-gradient-to-br from-emerald-950/80 to-slate-900 border border-emerald-800/40 shadow-xl">
+          <div className="p-5 rounded-2xl bg-zinc-900/60 border border-zinc-800/80 shadow-sm">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+              <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">
                 Total Recaudado
               </span>
-              <div className="p-2 rounded-xl bg-emerald-900/60 text-emerald-400">
-                <CheckCircle className="w-5 h-5" />
+              <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                <CheckCircle className="w-4 h-4" />
               </div>
             </div>
-            <div className="text-3xl font-black text-emerald-400 font-mono">
+            <div className="text-2xl sm:text-3xl font-bold text-emerald-400 font-mono">
               ${stats.totalCollected.toLocaleString('es-CO')} COP
             </div>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-xs text-zinc-400 mt-1">
               Dinero recibido y confirmado en caja
             </p>
           </div>
 
-          <div className="p-5 rounded-2xl bg-gradient-to-br from-orange-950/80 to-slate-900 border border-orange-800/40 shadow-xl">
+          <div className="p-5 rounded-2xl bg-zinc-900/60 border border-zinc-800/80 shadow-sm">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+              <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">
                 Pendiente por Cobrar
               </span>
-              <div className="p-2 rounded-xl bg-orange-900/60 text-orange-400">
-                <Clock className="w-5 h-5" />
+              <div className="p-1.5 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                <Clock className="w-4 h-4" />
               </div>
             </div>
-            <div className="text-3xl font-black text-orange-400 font-mono">
+            <div className="text-2xl sm:text-3xl font-bold text-amber-400 font-mono">
               ${stats.totalPending.toLocaleString('es-CO')} COP
             </div>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-xs text-zinc-400 mt-1">
               De {stats.pendingCustomersCount} clientes con saldo pendiente
             </p>
           </div>
 
-          <div className="p-5 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-900 border border-slate-800 shadow-xl">
+          <div className="p-5 rounded-2xl bg-zinc-900/60 border border-zinc-800/80 shadow-sm">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+              <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">
                 Meta Total (100 números)
               </span>
-              <div className="p-2 rounded-xl bg-slate-800 text-amber-400">
-                <DollarSign className="w-5 h-5" />
+              <div className="p-1.5 rounded-lg bg-zinc-800 text-zinc-300 border border-zinc-700/60">
+                <DollarSign className="w-4 h-4" />
               </div>
             </div>
-            <div className="text-3xl font-black text-white font-mono">
+            <div className="text-2xl sm:text-3xl font-bold text-white font-mono">
               $4.000.000 COP
             </div>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-xs text-zinc-400 mt-1">
               100 números × $40.000 COP
             </p>
           </div>
         </div>
 
         {/* Buscador de pagos */}
-        <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-xl flex items-center justify-between">
+        <div className="bg-zinc-900/60 border border-zinc-800/80 rounded-2xl p-4 shadow-sm flex items-center justify-between">
           <div className="relative w-full sm:w-96">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Buscar en historial por cliente o método..."
-              className="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs sm:text-sm placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+              className="w-full pl-10 pr-3.5 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-white text-xs sm:text-sm placeholder-zinc-500 focus:outline-none focus:border-zinc-600"
             />
           </div>
-          <span className="text-xs text-slate-400 font-medium">
-            Total transacciones: {filteredPayments.length}
+          <span className="text-xs text-zinc-400 font-mono">
+            Transacciones: {filteredPayments.length}
           </span>
         </div>
 
         {/* Historial de Pagos y Abonos */}
-        <div className="bg-slate-900/90 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
-          <div className="px-5 py-4 border-b border-slate-800 flex items-center justify-between">
-            <h2 className="text-base font-bold text-white flex items-center gap-2">
-              <FileText className="w-4 h-4 text-amber-400" />
+        <div className="bg-zinc-900/60 border border-zinc-800/80 rounded-2xl overflow-hidden shadow-sm">
+          <div className="px-5 py-4 border-b border-zinc-800 flex items-center justify-between">
+            <h2 className="text-sm font-bold text-white flex items-center gap-2">
+              <FileText className="w-4 h-4 text-zinc-400" />
               <span>Libro Mayor de Pagos y Abonos</span>
             </h2>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs sm:text-sm">
-              <thead className="bg-slate-950/80 text-slate-400 uppercase tracking-wider text-[11px] border-b border-slate-800">
+              <thead className="bg-zinc-950 text-zinc-400 uppercase tracking-wider text-[11px] border-b border-zinc-800 font-semibold">
                 <tr>
-                  <th className="px-4 py-3.5 font-bold">Fecha & Hora</th>
-                  <th className="px-4 py-3.5 font-bold">Cliente</th>
-                  <th className="px-4 py-3.5 font-bold">Monto Abono</th>
-                  <th className="px-4 py-3.5 font-bold">Total Abonado</th>
-                  <th className="px-4 py-3.5 font-bold">Saldo Pendiente (Debe)</th>
-                  <th className="px-4 py-3.5 font-bold">Tipo & Método</th>
-                  <th className="px-4 py-3.5 font-bold">Referencia / Notas</th>
-                  <th className="px-4 py-3.5 font-bold text-center">Acciones</th>
+                  <th className="px-4 py-3.5">Fecha & Hora</th>
+                  <th className="px-4 py-3.5">Cliente</th>
+                  <th className="px-4 py-3.5">Monto Abono</th>
+                  <th className="px-4 py-3.5">Total Abonado</th>
+                  <th className="px-4 py-3.5">Saldo Pendiente (Debe)</th>
+                  <th className="px-4 py-3.5">Tipo & Método</th>
+                  <th className="px-4 py-3.5">Referencia / Notas</th>
+                  <th className="px-4 py-3.5 text-center">Acciones</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60">
+              <tbody className="divide-y divide-zinc-800/60">
                 {filteredPayments.map((p) => (
-                  <tr key={p.id} className="hover:bg-slate-800/40 transition-colors">
-                    <td className="px-4 py-3.5 font-mono text-slate-300 text-xs whitespace-nowrap">
+                  <tr key={p.id} className="hover:bg-zinc-800/30 transition-colors">
+                    <td className="px-4 py-3.5 font-mono text-zinc-400 text-xs whitespace-nowrap">
                       {new Date(p.paidAt).toLocaleString('es-CO')}
                     </td>
                     <td className="px-4 py-3.5">
-                      <div className="font-bold text-white">{p.customerName}</div>
-                      <div className="text-[11px] text-slate-400 font-mono flex items-center gap-1.5 mt-0.5">
+                      <div className="font-semibold text-white">{p.customerName}</div>
+                      <div className="text-[11px] text-zinc-400 font-mono flex items-center gap-1.5 mt-0.5">
                         <span>{p.customerPhone}</span>
                         {p.customerNumbers && p.customerNumbers.length > 0 && (
-                          <span className="text-amber-400 font-bold">
+                          <span className="text-zinc-300 font-semibold">
                             [{p.customerNumbers.map((n) => `#${n}`).join(', ')}]
                           </span>
                         )}
                       </div>
                     </td>
-                    <td className="px-4 py-3.5 font-mono font-black text-emerald-400 text-sm sm:text-base whitespace-nowrap">
+                    <td className="px-4 py-3.5 font-mono font-bold text-emerald-400 text-sm whitespace-nowrap">
                       ${p.amount.toLocaleString('es-CO')} COP
                     </td>
-                    <td className="px-4 py-3.5 font-mono font-bold text-emerald-300 text-xs whitespace-nowrap">
+                    <td className="px-4 py-3.5 font-mono text-zinc-300 text-xs whitespace-nowrap">
                       ${(p.customerTotalPaid ?? p.amount).toLocaleString('es-CO')} COP
                     </td>
                     <td className="px-4 py-3.5 whitespace-nowrap">
                       <span
-                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono font-bold ${
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono font-semibold ${
                           (p.customerPendingBalance ?? 0) > 0
-                            ? 'bg-amber-950/80 border border-amber-600/50 text-amber-300'
-                            : 'bg-emerald-950/80 border border-emerald-600/50 text-emerald-300'
+                            ? 'bg-amber-500/10 border border-amber-500/20 text-amber-400'
+                            : 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400'
                         }`}
                       >
                         ${(p.customerPendingBalance ?? 0).toLocaleString('es-CO')} COP
                         {(p.customerPendingBalance ?? 0) > 0 ? (
-                          <span className="text-[10px] uppercase font-sans text-amber-400 font-extrabold">(Debe)</span>
+                          <span className="text-[10px] uppercase font-sans text-amber-400 font-bold">(Debe)</span>
                         ) : (
-                          <span className="text-[10px] uppercase font-sans text-emerald-400 font-extrabold">(Al día)</span>
+                          <span className="text-[10px] uppercase font-sans text-emerald-400 font-bold">(Al día)</span>
                         )}
                       </span>
                     </td>
                     <td className="px-4 py-3.5 whitespace-nowrap">
                       <div className="flex flex-col gap-1">
                         <span
-                          className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold w-fit ${
+                          className={`inline-block px-2 py-0.5 rounded text-[10px] font-semibold w-fit ${
                             p.paymentType === 'TOTAL'
-                              ? 'bg-emerald-950 text-emerald-300 border border-emerald-800/40'
-                              : 'bg-blue-950 text-sky-300 border border-blue-800/40'
+                              ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                              : 'bg-blue-500/10 text-sky-400 border border-blue-500/20'
                           }`}
                         >
                           {p.paymentType === 'TOTAL' ? 'PAGO COMPLETO' : 'ABONO PARCIAL'}
                         </span>
-                        <span className="text-xs text-slate-300 font-semibold">{p.paymentMethod}</span>
+                        <span className="text-xs text-zinc-300">{p.paymentMethod}</span>
                       </div>
                     </td>
-                    <td className="px-4 py-3.5 text-xs text-slate-400">
+                    <td className="px-4 py-3.5 text-xs text-zinc-400">
                       {p.reference && (
-                        <div className="font-mono text-amber-400 font-medium">Ref: {p.reference}</div>
+                        <div className="font-mono text-zinc-300">Ref: {p.reference}</div>
                       )}
                       {p.notes && <div>{p.notes}</div>}
-                      {!p.reference && !p.notes && <span className="text-slate-600">-</span>}
+                      {!p.reference && !p.notes && <span className="text-zinc-600">-</span>}
                     </td>
                     <td className="px-4 py-3.5 text-center whitespace-nowrap">
                       <button
@@ -399,7 +399,7 @@ export default function FinancePage() {
                         title="Eliminar este abono/pago"
                         disabled={deletingId === p.id}
                         onClick={() => handleDeletePayment(p)}
-                        className="p-2 rounded-xl text-slate-400 hover:text-red-400 hover:bg-red-950/50 border border-slate-800 hover:border-red-800/50 transition-all cursor-pointer disabled:opacity-50"
+                        className="p-1.5 rounded-lg text-zinc-400 hover:text-red-400 hover:bg-red-950/40 border border-zinc-800 hover:border-red-800/40 transition-all cursor-pointer disabled:opacity-50"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -409,7 +409,7 @@ export default function FinancePage() {
 
                 {filteredPayments.length === 0 && !loading && (
                   <tr>
-                    <td colSpan={8} className="text-center py-12 text-slate-500">
+                    <td colSpan={8} className="text-center py-12 text-zinc-500">
                       No se registran pagos en el historial todavía.
                     </td>
                   </tr>

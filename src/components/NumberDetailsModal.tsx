@@ -74,8 +74,8 @@ export default function NumberDetailsModal({
       default:
         return {
           label: status,
-          bg: 'bg-slate-900 border-slate-700 text-slate-300',
-          dot: 'bg-slate-400',
+          bg: 'bg-zinc-900 border-zinc-700 text-zinc-300',
+          dot: 'bg-zinc-400',
         };
     }
   };
@@ -105,30 +105,30 @@ export default function NumberDetailsModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-      <div className="relative w-full max-w-lg bg-slate-900 border border-slate-700/80 rounded-2xl shadow-2xl overflow-hidden">
+      <div className="relative w-full max-w-lg bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl overflow-hidden">
         {/* Header con número destacado */}
-        <div className="flex items-center justify-between px-6 py-5 bg-gradient-to-r from-red-950 via-slate-900 to-slate-900 border-b border-red-900/40">
+        <div className="flex items-center justify-between px-6 py-5 bg-zinc-950 border-b border-zinc-800">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-red-600 to-amber-500 flex items-center justify-center shadow-lg shadow-red-600/40">
-              <span className="font-mono text-3xl font-black text-white tracking-wider">
+            <div className="w-14 h-14 rounded-xl bg-zinc-800 border border-zinc-700/80 flex items-center justify-center shadow-xs">
+              <span className="font-mono text-2xl sm:text-3xl font-black text-white tracking-wider">
                 {numberData.number}
               </span>
             </div>
             <div>
-              <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest">
+              <span className="text-[10px] font-semibold text-zinc-400 uppercase tracking-widest">
                 Detalle del Número
               </span>
-              <h3 className="text-xl font-extrabold text-white">
+              <h3 className="text-lg font-bold text-white">
                 Número #{numberData.number}
               </h3>
-              <div className="flex items-center gap-2 mt-1">
+              <div className="flex items-center gap-2 mt-0.5">
                 <span
-                  className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold border ${statusInfo.bg}`}
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold border ${statusInfo.bg}`}
                 >
-                  <span className={`w-2 h-2 rounded-full ${statusInfo.dot} animate-pulse`} />
+                  <span className={`w-1.5 h-1.5 rounded-full ${statusInfo.dot}`} />
                   {statusInfo.label}
                 </span>
-                <span className="text-xs font-bold text-amber-400">
+                <span className="text-xs font-mono font-semibold text-zinc-300">
                   $40.000 COP
                 </span>
               </div>
@@ -136,7 +136,7 @@ export default function NumberDetailsModal({
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -152,23 +152,23 @@ export default function NumberDetailsModal({
           )}
 
           {numberData.customer ? (
-            <div className="space-y-3 bg-slate-950/70 p-4 rounded-xl border border-slate-800">
-              <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+            <div className="space-y-3 bg-zinc-950/70 p-4 rounded-xl border border-zinc-800">
+              <div className="flex items-center justify-between pb-2 border-b border-zinc-800">
+                <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
                   Comprador Asociado
                 </span>
-                <span className="text-xs font-medium text-slate-500">
+                <span className="text-xs font-medium text-zinc-500">
                   ID: {numberData.customer.id.substring(0, 8)}...
                 </span>
               </div>
 
               <div className="space-y-2 text-sm">
-                <div className="flex items-center gap-2.5 text-slate-200">
-                  <User className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                <div className="flex items-center gap-2.5 text-zinc-200">
+                  <User className="w-4 h-4 text-zinc-400 flex-shrink-0" />
                   <span className="font-bold">{numberData.customer.fullName}</span>
                 </div>
 
-                <div className="flex items-center justify-between text-slate-300">
+                <div className="flex items-center justify-between text-zinc-300">
                   <div className="flex items-center gap-2.5">
                     <Phone className="w-4 h-4 text-emerald-400 flex-shrink-0" />
                     <span>{numberData.customer.phone}</span>
@@ -185,14 +185,14 @@ export default function NumberDetailsModal({
                   </a>
                 </div>
 
-                <div className="flex items-center gap-2.5 text-slate-300">
-                  <MapPin className="w-4 h-4 text-red-400 flex-shrink-0" />
+                <div className="flex items-center gap-2.5 text-zinc-300">
+                  <MapPin className="w-4 h-4 text-zinc-400 flex-shrink-0" />
                   <span>{numberData.customer.address}</span>
                 </div>
 
                 {numberData.assignment && (
-                  <div className="flex items-center gap-2.5 text-xs text-slate-400 pt-1">
-                    <Calendar className="w-3.5 h-3.5 text-slate-500" />
+                  <div className="flex items-center gap-2.5 text-xs text-zinc-400 pt-1">
+                    <Calendar className="w-3.5 h-3.5 text-zinc-500" />
                     <span>
                       Registrado:{' '}
                       {new Date(numberData.assignment.assignedAt).toLocaleString('es-CO')}
@@ -201,20 +201,20 @@ export default function NumberDetailsModal({
                 )}
 
                 {numberData.hasAbono && (
-                  <div className="mt-3 p-3 rounded-xl bg-blue-950/80 border border-blue-500/50 space-y-1.5 text-xs">
-                    <div className="flex items-center justify-between text-blue-200 font-bold">
+                  <div className="mt-3 p-3 rounded-xl bg-zinc-900 border border-zinc-800 space-y-1.5 text-xs">
+                    <div className="flex items-center justify-between text-zinc-300 font-semibold">
                       <span>Estado Financiero:</span>
-                      <span className="uppercase text-sky-300">Con Abono Parcial</span>
+                      <span className="uppercase text-sky-400 font-bold">Con Abono Parcial</span>
                     </div>
-                    <div className="flex items-center justify-between text-slate-300">
+                    <div className="flex items-center justify-between text-zinc-400">
                       <span>Abonado hasta ahora:</span>
                       <span className="font-mono font-bold text-emerald-400">
                         ${numberData.totalPaid?.toLocaleString('es-CO')} COP
                       </span>
                     </div>
-                    <div className="flex items-center justify-between text-slate-300">
+                    <div className="flex items-center justify-between text-zinc-400">
                       <span>Resta por pagar (Debe):</span>
-                      <span className="font-mono font-black text-amber-300 text-sm">
+                      <span className="font-mono font-bold text-amber-400">
                         ${numberData.pendingBalance?.toLocaleString('es-CO')} COP
                       </span>
                     </div>
@@ -223,13 +223,13 @@ export default function NumberDetailsModal({
               </div>
             </div>
           ) : (
-            <div className="text-center py-6 bg-slate-950/50 rounded-xl border border-slate-800">
-              <span className="text-3xl mb-2 block">🎟️</span>
-              <p className="text-sm font-semibold text-slate-200">
+            <div className="text-center py-6 bg-zinc-950/60 rounded-xl border border-zinc-800">
+              <span className="text-2xl mb-1.5 block">🎟️</span>
+              <p className="text-sm font-semibold text-zinc-200">
                 Este número está disponible para la venta
               </p>
-              <p className="text-xs text-slate-400 mt-1 max-w-xs mx-auto">
-                Puedes asignarlo inmediatamente a un nuevo cliente o marcarlo como reservado.
+              <p className="text-xs text-zinc-400 mt-1 max-w-xs mx-auto">
+                Puedes asignarlo inmediatamente a un nuevo cliente o registrar su venta.
               </p>
             </div>
           )}
@@ -243,7 +243,7 @@ export default function NumberDetailsModal({
                   onClose();
                   onAssignCustomer(numberData.number);
                 }}
-                className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-bold bg-gradient-to-r from-red-600 via-amber-500 to-red-600 text-white hover:opacity-95 shadow-lg shadow-red-600/30 transition-all cursor-pointer"
+                className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold bg-zinc-100 hover:bg-white text-zinc-950 shadow-sm transition-all cursor-pointer"
               >
                 <UserPlus className="w-4 h-4" />
                 <span>Asignar y Vender a Cliente</span>
@@ -255,7 +255,7 @@ export default function NumberDetailsModal({
                     type="button"
                     disabled={loading}
                     onClick={() => handleUpdateStatus('SOLD_PAID')}
-                    className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition-colors cursor-pointer"
+                    className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white transition-colors cursor-pointer"
                   >
                     <CheckCircle2 className="w-4 h-4" />
                     <span>Marcar como PAGADO</span>
@@ -269,9 +269,9 @@ export default function NumberDetailsModal({
                       onClose();
                       onOpenPaymentModal(numberData.customer!.id, numberData.customer!.fullName);
                     }}
-                    className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl text-xs font-bold bg-amber-600 hover:bg-amber-500 text-white transition-colors cursor-pointer"
+                    className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-semibold bg-zinc-800 hover:bg-zinc-700 text-zinc-100 border border-zinc-700 transition-colors cursor-pointer"
                   >
-                    <CreditCard className="w-4 h-4" />
+                    <CreditCard className="w-4 h-4 text-zinc-300" />
                     <span>Registrar Abono</span>
                   </button>
                 )}
@@ -288,9 +288,9 @@ export default function NumberDetailsModal({
                       handleUpdateStatus('AVAILABLE');
                     }
                   }}
-                  className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl text-xs font-medium bg-slate-800 hover:bg-red-950 hover:text-red-300 text-slate-300 border border-slate-700 transition-colors cursor-pointer sm:col-span-2"
+                  className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-medium bg-zinc-900 hover:bg-red-950 hover:text-red-300 text-zinc-400 border border-zinc-800 transition-colors cursor-pointer sm:col-span-2"
                 >
-                  <Unlock className="w-4 h-4 text-red-400" />
+                  <Unlock className="w-4 h-4 text-zinc-400" />
                   <span>Liberar Número (Volver a Disponible)</span>
                 </button>
               </div>

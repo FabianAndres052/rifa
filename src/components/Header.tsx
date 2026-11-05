@@ -60,29 +60,29 @@ export default function Header({ realtimeStatus = true }: HeaderProps) {
   if (pathname === '/login') return null;
 
   return (
-    <header className="sticky top-0 z-40 bg-slate-950/90 backdrop-blur-md border-b border-red-900/40 text-white shadow-xl shadow-red-950/20">
+    <header className="sticky top-0 z-40 bg-zinc-950/90 backdrop-blur-md border-b border-zinc-800/80 text-zinc-100 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo y Nombre */}
           <div className="flex items-center gap-3">
-            <Link href="/" className="flex items-center gap-2 group">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-600 via-amber-500 to-red-700 flex items-center justify-center shadow-lg shadow-red-600/40 group-hover:scale-105 transition-transform duration-200">
-                <Sparkles className="w-5 h-5 text-white" />
+            <Link href="/" className="flex items-center gap-2.5 group">
+              <div className="w-9 h-9 rounded-xl bg-zinc-900 border border-zinc-700/80 flex items-center justify-center text-zinc-100 group-hover:border-zinc-500 transition-colors shadow-sm">
+                <Sparkles className="w-4 h-4 text-zinc-200" />
               </div>
               <div className="flex flex-col">
-                <span className="font-extrabold text-lg tracking-tight bg-gradient-to-r from-red-400 via-amber-300 to-yellow-200 bg-clip-text text-transparent">
+                <span className="font-bold text-sm sm:text-base tracking-tight text-zinc-100">
                   SUPER RIFA NAVIDEÑA
                 </span>
-                <span className="text-[10px] text-slate-400 -mt-1 font-medium tracking-wider">
+                <span className="text-[10px] text-zinc-400 -mt-0.5 font-medium tracking-wide uppercase">
                   MOTO ELÉCTRICA GW E-MAX 800W
                 </span>
               </div>
             </Link>
 
             {/* Badge de Tiempo Real */}
-            <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-950/80 border border-emerald-500/30 text-emerald-300">
-              <Radio className={`w-3.5 h-3.5 ${realtimeStatus ? 'text-emerald-400 animate-pulse' : 'text-slate-400'}`} />
-              <span>{realtimeStatus ? 'En Vivo (SSE)' : 'Conectando...'}</span>
+            <div className="hidden md:flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-medium bg-zinc-900/90 border border-zinc-800 text-zinc-300">
+              <span className={`w-2 h-2 rounded-full ${realtimeStatus ? 'bg-emerald-400 shadow-sm shadow-emerald-400/50 animate-pulse' : 'bg-zinc-500'}`} />
+              <span className="text-[11px] font-mono">{realtimeStatus ? 'En Vivo' : 'Conectando...'}</span>
             </div>
           </div>
 
@@ -95,10 +95,10 @@ export default function Header({ realtimeStatus = true }: HeaderProps) {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all duration-150 ${
                     isActive
-                      ? 'bg-gradient-to-r from-red-600 to-red-700 text-white shadow-md shadow-red-700/30'
-                      : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+                      ? 'bg-zinc-800 text-zinc-100 border border-zinc-700/60 shadow-sm'
+                      : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/70'
                   }`}
                 >
                   <Icon className="w-4 h-4" />
@@ -109,17 +109,17 @@ export default function Header({ realtimeStatus = true }: HeaderProps) {
           </nav>
 
           {/* Acciones de usuario / Admin */}
-          <div className="hidden sm:flex items-center gap-3">
+          <div className="hidden sm:flex items-center gap-2.5">
             {adminUser && (
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-xs text-slate-300">
-                <UserCheck className="w-3.5 h-3.5 text-amber-400" />
-                <span className="font-medium text-slate-200">{adminUser.fullName || adminUser.username}</span>
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-900/90 border border-zinc-800 text-xs text-zinc-300">
+                <UserCheck className="w-3.5 h-3.5 text-zinc-400" />
+                <span className="font-medium text-zinc-200">{adminUser.fullName || adminUser.username}</span>
               </div>
             )}
             <button
               onClick={handleLogout}
               title="Cerrar sesión"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-red-950/60 hover:bg-red-900 text-red-200 border border-red-800/40 transition-colors cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-zinc-800 transition-colors cursor-pointer"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span>Salir</span>
@@ -130,9 +130,9 @@ export default function Header({ realtimeStatus = true }: HeaderProps) {
           <div className="flex lg:hidden items-center gap-2">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white"
+              className="p-2 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-white"
             >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
@@ -140,7 +140,7 @@ export default function Header({ realtimeStatus = true }: HeaderProps) {
 
       {/* Menú Desplegable Móvil */}
       {mobileMenuOpen && (
-        <div className="lg:hidden border-t border-slate-800 bg-slate-950/95 px-4 pt-3 pb-4 space-y-2">
+        <div className="lg:hidden border-t border-zinc-800 bg-zinc-950/95 px-4 pt-3 pb-4 space-y-1.5">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href;
@@ -149,24 +149,24 @@ export default function Header({ realtimeStatus = true }: HeaderProps) {
                 key={item.href}
                 href={item.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium ${
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium ${
                   isActive
-                    ? 'bg-red-600 text-white'
-                    : 'text-slate-300 hover:bg-slate-800/80 hover:text-white'
+                    ? 'bg-zinc-800 text-white border border-zinc-700/60'
+                    : 'text-zinc-400 hover:bg-zinc-900/80 hover:text-white'
                 }`}
               >
-                <Icon className="w-5 h-5" />
+                <Icon className="w-4 h-4" />
                 <span>{item.label}</span>
               </Link>
             );
           })}
-          <div className="pt-2 border-t border-slate-800 flex items-center justify-between">
-            <span className="text-xs text-slate-400">
+          <div className="pt-2 border-t border-zinc-800 flex items-center justify-between">
+            <span className="text-xs text-zinc-400">
               {adminUser ? adminUser.fullName : 'Admin'}
             </span>
             <button
               onClick={handleLogout}
-              className="flex items-center gap-1 text-xs text-red-400 hover:text-red-300 font-medium"
+              className="flex items-center gap-1 text-xs text-zinc-400 hover:text-white font-medium"
             >
               <LogOut className="w-4 h-4" />
               <span>Cerrar sesión</span>

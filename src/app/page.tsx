@@ -144,70 +144,67 @@ export default function DashboardPage() {
     .map((n) => n.number);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 selection:bg-red-600 selection:text-white">
+    <div className="min-h-screen bg-zinc-950 text-zinc-100 selection:bg-zinc-800 selection:text-white">
       <Header realtimeStatus={realtimeConnected} />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        {/* Banner Hero Oficial de la Rifa */}
-        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-red-950 via-slate-900 to-amber-950 border border-red-900/50 shadow-2xl p-6 sm:p-8">
-          <div className="absolute top-0 right-0 -mr-16 -mt-16 w-80 h-80 rounded-full bg-red-600/10 blur-3xl pointer-events-none" />
-          <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-80 h-80 rounded-full bg-amber-500/10 blur-3xl pointer-events-none" />
-
+        {/* Banner Hero Oficial de la Rifa - Estética Neutra Profesional */}
+        <section className="relative overflow-hidden rounded-2xl bg-zinc-900/60 border border-zinc-800/80 shadow-sm p-6 sm:p-8">
           <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-            <div className="space-y-3 max-w-2xl">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-red-600 to-amber-600 text-white shadow-md">
-                <Sparkles className="w-3.5 h-3.5" />
+            <div className="space-y-4 max-w-2xl">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-zinc-800 text-zinc-200 border border-zinc-700/60">
+                <Sparkles className="w-3.5 h-3.5 text-zinc-300" />
                 <span>Rifa Oficial 100 Números (00 - 99)</span>
               </div>
 
-              <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">
-                ¡GRAN PREMIO MAYOR! <br />
-                <span className="bg-gradient-to-r from-red-400 via-amber-300 to-yellow-200 bg-clip-text text-transparent">
-                  MOTO ELÉCTRICA GW E-MAX 800W
-                </span>
-              </h1>
+              <div>
+                <span className="text-xs uppercase tracking-widest font-bold text-zinc-400">Gran Premio Mayor</span>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight leading-tight mt-0.5">
+                  Moto Eléctrica GW E-MAX 800W
+                </h1>
+              </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm text-slate-300 pt-1">
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-amber-400" />
-                  <span>Sorteo Mayor: <strong>23 de Diciembre de 2026</strong></span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs text-zinc-300 pt-1">
+                <div className="flex items-center gap-2.5 p-2 rounded-xl bg-zinc-950/60 border border-zinc-800/70">
+                  <Calendar className="w-4 h-4 text-zinc-400 flex-shrink-0" />
+                  <span>Sorteo Mayor: <strong className="text-white">23 de Dic, 2026</strong></span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Trophy className="w-4 h-4 text-amber-400" />
-                  <span>Juega con: <strong>Lotería Sinuano Noche</strong></span>
+                <div className="flex items-center gap-2.5 p-2 rounded-xl bg-zinc-950/60 border border-zinc-800/70">
+                  <Trophy className="w-4 h-4 text-zinc-400 flex-shrink-0" />
+                  <span>Juega con: <strong className="text-white">Sinuano Noche</strong></span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Gift className="w-4 h-4 text-emerald-400" />
-                  <span>3 Premios Adicionales de: <strong>$100.000 COP</strong></span>
+                <div className="flex items-center gap-2.5 p-2 rounded-xl bg-zinc-950/60 border border-zinc-800/70">
+                  <Gift className="w-4 h-4 text-zinc-400 flex-shrink-0" />
+                  <span>Premios Adicionales: <strong className="text-white">3 × $100.000 COP</strong></span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Zap className="w-4 h-4 text-emerald-400" />
-                  <span>Valor de cada número: <strong>$40.000 COP</strong></span>
+                <div className="flex items-center gap-2.5 p-2 rounded-xl bg-zinc-950/60 border border-zinc-800/70">
+                  <Zap className="w-4 h-4 text-zinc-400 flex-shrink-0" />
+                  <span>Valor Número: <strong className="text-white">$40.000 COP</strong></span>
                 </div>
               </div>
             </div>
 
-            {/* Botón de Registro Rápido */}
-            <div className="flex flex-col sm:flex-row lg:flex-col gap-3 justify-end">
+            {/* Acciones Rápidas */}
+            <div className="flex flex-col sm:flex-row lg:flex-col gap-2.5 justify-end lg:min-w-[220px]">
               <button
                 type="button"
                 onClick={() => {
                   setInitialNumbersForCustomer([]);
                   setCustomerModalOpen(true);
                 }}
-                className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl text-sm font-bold bg-gradient-to-r from-red-600 via-amber-500 to-red-600 text-white hover:opacity-95 shadow-xl shadow-red-600/30 transition-all cursor-pointer transform hover:scale-105 active:scale-95"
+                className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-xs sm:text-sm font-semibold bg-zinc-100 hover:bg-white text-zinc-950 shadow-sm transition-all cursor-pointer active:scale-98"
               >
-                <UserPlus className="w-5 h-5" />
-                <span>Registrar Cliente & Asignar</span>
+                <UserPlus className="w-4 h-4" />
+                <span>Registrar Cliente</span>
               </button>
 
               <button
                 type="button"
                 onClick={loadData}
-                className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold bg-slate-900/80 hover:bg-slate-800 text-slate-300 border border-slate-700/60 transition-colors"
+                className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-medium bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 transition-colors cursor-pointer"
               >
-                <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-                <span>Actualizar Datos Ahora</span>
+                <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-zinc-200' : 'text-zinc-400'}`} />
+                <span>Actualizar Datos</span>
               </button>
             </div>
           </div>
@@ -222,14 +219,14 @@ export default function DashboardPage() {
         <section className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-black text-white tracking-tight flex items-center gap-2">
+              <h2 className="text-lg sm:text-xl font-bold text-white tracking-tight flex items-center gap-2.5">
                 <span>Cartón Interactivo de la Rifa</span>
-                <span className="text-xs px-2.5 py-0.5 rounded-full bg-red-600/30 border border-red-500/40 text-red-300 font-mono">
+                <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-zinc-800 border border-zinc-700/60 text-zinc-300 font-mono font-medium">
                   10 × 10 (00 - 99)
                 </span>
               </h2>
-              <p className="text-xs text-slate-400">
-                Selecciona números para consultar compradores, registrar ventas o cambiar estados en MySQL.
+              <p className="text-xs text-zinc-400 mt-0.5">
+                Selecciona números para consultar compradores, registrar ventas o cambiar estados en tiempo real.
               </p>
             </div>
           </div>

@@ -125,25 +125,25 @@ export default function CustomerModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in overflow-y-auto">
-      <div className="relative w-full max-w-2xl bg-slate-900 border border-slate-700/80 rounded-2xl shadow-2xl overflow-hidden my-8">
+      <div className="relative w-full max-w-2xl bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl overflow-hidden my-8">
         {/* Cabecera del Modal */}
-        <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-red-900/80 via-slate-900 to-slate-900 border-b border-red-800/40">
+        <div className="flex items-center justify-between px-6 py-4 bg-zinc-950 border-b border-zinc-800">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-red-600/30 border border-red-500/40 text-red-300">
+            <div className="p-2 rounded-xl bg-zinc-800 border border-zinc-700/60 text-zinc-300">
               <User className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-white tracking-tight">
+              <h3 className="text-base sm:text-lg font-bold text-white tracking-tight">
                 Registrar Cliente & Asignar Números
               </h3>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-zinc-400">
                 Valor por número: $40.000 COP | Sorteo Moto Eléctrica
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -161,62 +161,62 @@ export default function CustomerModal({
           {/* Información del Cliente */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1.5">
                 Nombre Completo *
               </label>
               <div className="relative">
-                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
                 <input
                   type="text"
                   required
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   placeholder="Ej: Carlos Alberto Gómez"
-                  className="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-red-500 text-sm"
+                  className="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500 text-sm"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1.5">
                 Número de Teléfono *
               </label>
               <div className="relative">
-                <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
                 <input
                   type="tel"
                   required
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="Ej: 300 123 4567"
-                  className="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-red-500 text-sm"
+                  className="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500 text-sm"
                 />
               </div>
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1.5">
                 Dirección de Residencia *
               </label>
               <div className="relative">
-                <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
                 <input
                   type="text"
                   required
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
                   placeholder="Ej: Cra 45 # 72 - 15, Barranquilla"
-                  className="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-red-500 text-sm"
+                  className="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500 text-sm"
                 />
               </div>
             </div>
           </div>
 
           {/* Selector y Gestión de Números */}
-          <div className="p-4 rounded-xl bg-slate-950/70 border border-slate-800 space-y-3">
+          <div className="p-4 rounded-xl bg-zinc-950/70 border border-zinc-800 space-y-3">
             <div className="flex items-center justify-between">
-              <label className="flex items-center gap-1.5 text-xs font-bold text-amber-400 uppercase tracking-wider">
-                <Hash className="w-4 h-4" />
+              <label className="flex items-center gap-1.5 text-xs font-bold text-zinc-200 uppercase tracking-wider">
+                <Hash className="w-4 h-4 text-zinc-400" />
                 Números Asignados ({selectedNumbers.length})
               </label>
               <div className="flex items-center gap-2">
@@ -226,7 +226,7 @@ export default function CustomerModal({
                   value={manualNumberInput}
                   onChange={(e) => setManualNumberInput(e.target.value)}
                   placeholder="00-99"
-                  className="w-16 px-2.5 py-1 text-center font-mono font-bold rounded-lg bg-slate-900 border border-slate-700 text-amber-300 text-sm"
+                  className="w-16 px-2.5 py-1 text-center font-mono font-bold rounded-lg bg-zinc-900 border border-zinc-700 text-zinc-100 text-sm focus:outline-none focus:border-zinc-500"
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                       e.preventDefault();
@@ -237,7 +237,7 @@ export default function CustomerModal({
                 <button
                   type="button"
                   onClick={() => handleAddNumber(manualNumberInput)}
-                  className="px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-white font-medium cursor-pointer"
+                  className="px-3 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-xs text-zinc-200 font-medium cursor-pointer border border-zinc-700 transition-colors"
                 >
                   Agregar
                 </button>
@@ -245,22 +245,22 @@ export default function CustomerModal({
             </div>
 
             {/* Badges de números seleccionados */}
-            <div className="flex flex-wrap gap-2 min-h-[42px] p-2 bg-slate-900/80 rounded-lg border border-slate-800">
+            <div className="flex flex-wrap gap-2 min-h-[42px] p-2 bg-zinc-900/80 rounded-xl border border-zinc-800">
               {selectedNumbers.length === 0 ? (
-                <span className="text-xs text-slate-500 italic flex items-center">
+                <span className="text-xs text-zinc-500 italic flex items-center">
                   Ningún número seleccionado. Escribe uno arriba o selecciónalos en el cartón.
                 </span>
               ) : (
                 selectedNumbers.map((num) => (
                   <span
                     key={num}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold bg-gradient-to-r from-red-600 to-amber-600 text-white shadow-sm"
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-zinc-800 text-zinc-100 border border-zinc-700 shadow-sm"
                   >
                     #{num}
                     <button
                       type="button"
                       onClick={() => handleRemoveNumber(num)}
-                      className="hover:text-red-200 transition-colors"
+                      className="hover:text-zinc-400 transition-colors cursor-pointer"
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
@@ -270,8 +270,8 @@ export default function CustomerModal({
             </div>
 
             {/* Cálculo automático */}
-            <div className="flex items-center justify-between pt-2 border-t border-slate-800/80 text-sm">
-              <span className="text-slate-400">
+            <div className="flex items-center justify-between pt-2 border-t border-zinc-800 text-sm">
+              <span className="text-zinc-400">
                 Fórmula: {selectedNumbers.length} números × $40.000 COP
               </span>
               <span className="font-extrabold text-base text-emerald-400">
@@ -283,28 +283,28 @@ export default function CustomerModal({
           {/* Estado de Pago y Método */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1.5">
                 Estado del Pago *
               </label>
               <select
                 value={paymentStatus}
                 onChange={(e) => setPaymentStatus(e.target.value as any)}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-red-500 text-sm font-medium"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-100 focus:outline-none focus:border-zinc-500 text-sm font-medium"
               >
-                <option value="SOLD_PAID">🔴 Pagado (Efectivamente cancelado)</option>
-                <option value="SOLD_PENDING">🟠 Pendiente de Pago (Vendido por cobrar)</option>
-                <option value="RESERVED">🟡 Reservado (Apartado temporalmente)</option>
+                <option value="SOLD_PAID">Pagado (Efectivamente cancelado)</option>
+                <option value="SOLD_PENDING">Pendiente de Pago (Vendido por cobrar)</option>
+                <option value="RESERVED">Reservado (Apartado temporalmente)</option>
               </select>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1.5">
                 Método de Pago
               </label>
               <select
                 value={paymentMethod}
                 onChange={(e) => setPaymentMethod(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-red-500 text-sm"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-100 focus:outline-none focus:border-zinc-500 text-sm"
               >
                 <option value="EFECTIVO">Efectivo en Mano</option>
                 <option value="NEQUI">Nequi</option>
@@ -316,7 +316,7 @@ export default function CustomerModal({
 
             {paymentStatus === 'SOLD_PAID' && (
               <div className="md:col-span-2">
-                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1.5">
                   Referencia o Comprobante de Pago (Opcional)
                 </label>
                 <input
@@ -324,13 +324,13 @@ export default function CustomerModal({
                   value={paymentReference}
                   onChange={(e) => setPaymentReference(e.target.value)}
                   placeholder="Ej: Nro de aprobación Nequi #M098762"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-red-500 text-sm"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500 text-sm"
                 />
               </div>
             )}
 
             <div className="md:col-span-2">
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1.5">
                 Observaciones Opcionales
               </label>
               <textarea
@@ -338,25 +338,25 @@ export default function CustomerModal({
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Ej: Entregar boleta física el sábado, conocido del trabajo..."
-                className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-red-500 text-sm resize-none"
+                className="w-full px-3.5 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500 text-sm resize-none"
               />
             </div>
           </div>
 
           {/* Botones de acción */}
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-zinc-800">
             <button
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="px-4 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
+              className="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-medium text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors cursor-pointer"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={loading || selectedNumbers.length === 0}
-              className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold bg-gradient-to-r from-red-600 via-amber-500 to-red-600 text-white hover:opacity-95 shadow-lg shadow-red-600/30 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-zinc-100 hover:bg-white text-zinc-950 shadow-sm transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <CheckCircle className="w-4 h-4" />
               <span>{loading ? 'Guardando en MySQL...' : 'Guardar y Asociar Números'}</span>
