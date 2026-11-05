@@ -128,24 +128,23 @@ export async function PUT(
           data: { status: assignmentStatus },
         });
 
-        // Si se cambia a PAID y no había pagado, registrar el pago restante
+        // Si se cambia a PAID, eliminar cualquier abono previo y dejar el pago total exacto
         if (paymentStatus === 'PAID') {
           const totalCost = existing.numbers.reduce(
             (sum, n) => sum + Number(n.price || 40000),
             0
           );
-          const currentPayments = await tx.payment.aggregate({
-            where: { customerId: id },
-            _sum: { amount: true },
-          });
-          const currentTotal = Number(currentPayments._sum.amount || 0);
-          const diff = totalCost - currentTotal;
 
-          if (diff > 0) {
+          // Eliminar pagos y abonos previos del cliente para que no se sumen ni dupliquen
+          await tx.payment.deleteMany({
+            where: { customerId: id },
+          });
+
+          if (totalCost > 0) {
             await tx.payment.create({
               data: {
                 customerId: id,
-                amount: diff,
+                amount: totalCost,
                 paymentType: 'TOTAL',
                 paymentMethod: 'EFECTIVO',
                 notes: 'Pago total completado desde edición de cliente',
@@ -153,12 +152,9 @@ export async function PUT(
             });
           }
         } else if (paymentStatus === 'PENDING' || paymentStatus === 'RESERVED') {
-          // Si pasa a pendiente o reservado, revertir pagos totales para reflejar la realidad en Finanzas
+          // Si pasa a pendiente o reservado, eliminar pagos para reflejar la realidad en Finanzas
           await tx.payment.deleteMany({
-            where: {
-              customerId: id,
-              paymentType: 'TOTAL',
-            },
+            where: { customerId: id },
           });
         }
       }

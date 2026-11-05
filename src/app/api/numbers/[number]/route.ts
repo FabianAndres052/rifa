@@ -116,8 +116,8 @@ export async function PATCH(
 
         let amountToPay = 0;
 
-        // Si antes estaba pendiente o reservado y tiene cliente, registrar ÚNICAMENTE el saldo pendiente
-        // evitando duplicar o sumar abonos previos con el valor total
+        // Si antes estaba pendiente o reservado y tiene cliente, registrar el pago total del número
+        // eliminando cualquier abono previo para no duplicar ni sumar abonos con pagos completos
         if (existing.customerId && existing.status !== 'SOLD_PAID') {
           const customer = await tx.customer.findUnique({
             where: { id: existing.customerId },
@@ -129,18 +129,34 @@ export async function PATCH(
 
           if (customer) {
             const ticketPrice = Number(existing.price || 40000);
-            const totalCost = customer.numbers.reduce(
-              (sum, n) => sum + Number(n.price || ticketPrice),
-              0
-            );
-            const alreadyPaid = customer.payments.reduce(
+
+            // 1. Eliminar cualquier abono previo del cliente para que no se sume con el pago total
+            await tx.payment.deleteMany({
+              where: {
+                customerId: existing.customerId,
+                paymentType: 'ABONO',
+              },
+            });
+
+            // 2. Calcular cuántos números pagados tiene el cliente ahora
+            const paidNumbersCount = customer.numbers.filter(
+              (n) => n.number === numStr || n.status === 'SOLD_PAID'
+            ).length;
+            const requiredTotalPaid = paidNumbersCount * ticketPrice;
+
+            // 3. Consultar pagos TOTAL vigentes del cliente
+            const currentTotalPayments = await tx.payment.findMany({
+              where: {
+                customerId: existing.customerId,
+                paymentType: 'TOTAL',
+              },
+            });
+            const currentTotalPaid = currentTotalPayments.reduce(
               (sum, p) => sum + Number(p.amount),
               0
             );
-            const pendingBalance = Math.max(0, totalCost - alreadyPaid);
 
-            // El monto a pagar es estrictamente el saldo restante de la deuda, máximo el valor del boleto
-            amountToPay = Math.min(ticketPrice, pendingBalance);
+            amountToPay = Math.max(0, requiredTotalPaid - currentTotalPaid);
 
             if (amountToPay > 0) {
               await tx.payment.create({
@@ -149,21 +165,16 @@ export async function PATCH(
                   amount: amountToPay,
                   paymentType: 'TOTAL',
                   paymentMethod,
-                  notes:
-                    notes ||
-                    (pendingBalance < ticketPrice
-                      ? `Liquidación de saldo pendiente ($${amountToPay.toLocaleString('es-CO')} COP) para el número ${numStr}`
-                      : `Pago confirmado para el número ${numStr}`),
+                  notes: notes || `Pago confirmado para el número ${numStr}`,
                 },
               });
             }
 
-            // Si con esto el cliente cubre la totalidad de sus números, asegurar que todos queden en SOLD_PAID
-            if (alreadyPaid + amountToPay >= totalCost) {
-              await tx.raffleNumber.updateMany({
-                where: { customerId: customer.id },
-                data: { status: 'SOLD_PAID' },
-              });
+            // Si todos los números del cliente ya están pagados, sincronizar asignaciones
+            const allPaid = customer.numbers.every(
+              (n) => n.number === numStr || n.status === 'SOLD_PAID'
+            );
+            if (allPaid) {
               await tx.numberAssignment.updateMany({
                 where: { customerId: customer.id },
                 data: { status: 'PAID' },

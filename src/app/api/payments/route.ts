@@ -123,32 +123,28 @@ export async function POST(request: Request) {
         );
       }
 
-      // Si el pago es TOTAL o excede la deuda restante, asegurar que no sume de más
-      let finalAmount = numericAmount;
-      if (paymentType === 'TOTAL' && finalAmount > pendingBalance) {
-        finalAmount = pendingBalance;
-      } else if (finalAmount > pendingBalance) {
-        throw new Error(
-          `El monto ingresado ($${finalAmount.toLocaleString('es-CO')} COP) supera el saldo pendiente del cliente ($${pendingBalance.toLocaleString('es-CO')} COP).`
-        );
-      }
+      let newPayment;
 
-      // Crear el registro de pago con el monto verificado
-      const newPayment = await tx.payment.create({
-        data: {
-          customerId,
-          amount: finalAmount,
-          paymentType,
-          paymentMethod,
-          reference: reference?.trim() || null,
-          notes: notes?.trim() || null,
-        },
-      });
+      // Si el pago es TOTAL (pago completo de la deuda):
+      if (paymentType === 'TOTAL') {
+        // Eliminar cualquier abono parcial previo para que no se sume con el pago total
+        await tx.payment.deleteMany({
+          where: { customerId, paymentType: 'ABONO' },
+        });
 
-      const newTotalPaid = alreadyPaid + finalAmount;
+        // Crear el registro de pago TOTAL único con el valor completo de los números
+        newPayment = await tx.payment.create({
+          data: {
+            customerId,
+            amount: totalCost,
+            paymentType: 'TOTAL',
+            paymentMethod,
+            reference: reference?.trim() || null,
+            notes: notes?.trim() || `Pago total completado`,
+          },
+        });
 
-      // Si completó la deuda total, marcar los números como SOLD_PAID
-      if (newTotalPaid >= totalCost && customer.numbers.length > 0) {
+        // Marcar números y asignaciones como SOLD_PAID
         await tx.raffleNumber.updateMany({
           where: { customerId },
           data: { status: 'SOLD_PAID' },
@@ -158,6 +154,57 @@ export async function POST(request: Request) {
           where: { customerId },
           data: { status: 'PAID' },
         });
+      } else {
+        // Es un ABONO parcial
+        let finalAmount = numericAmount;
+        if (finalAmount > pendingBalance) {
+          throw new Error(
+            `El monto ingresado ($${finalAmount.toLocaleString('es-CO')} COP) supera el saldo pendiente del cliente ($${pendingBalance.toLocaleString('es-CO')} COP).`
+          );
+        }
+
+        const newTotalPaid = alreadyPaid + finalAmount;
+
+        // Si con este abono se completa el 100% de la deuda total:
+        if (newTotalPaid >= totalCost) {
+          // Eliminar los abonos anteriores y consolidar en un único pago TOTAL
+          await tx.payment.deleteMany({
+            where: { customerId, paymentType: 'ABONO' },
+          });
+
+          newPayment = await tx.payment.create({
+            data: {
+              customerId,
+              amount: totalCost,
+              paymentType: 'TOTAL',
+              paymentMethod,
+              reference: reference?.trim() || null,
+              notes: notes?.trim() || 'Pago completado al 100% mediante abonos',
+            },
+          });
+
+          await tx.raffleNumber.updateMany({
+            where: { customerId },
+            data: { status: 'SOLD_PAID' },
+          });
+
+          await tx.numberAssignment.updateMany({
+            where: { customerId },
+            data: { status: 'PAID' },
+          });
+        } else {
+          // El abono aún no cubre el total: se guarda como ABONO parcial
+          newPayment = await tx.payment.create({
+            data: {
+              customerId,
+              amount: finalAmount,
+              paymentType: 'ABONO',
+              paymentMethod,
+              reference: reference?.trim() || null,
+              notes: notes?.trim() || null,
+            },
+          });
+        }
       }
 
       // Auditoría
@@ -167,7 +214,7 @@ export async function POST(request: Request) {
           entity: 'payments',
           entityId: newPayment.id,
           performedBy: admin?.username || 'admin',
-          details: `Abono/Pago registrado por $${finalAmount.toLocaleString('es-CO')} COP para ${customer.fullName}. Método: ${paymentMethod}`,
+          details: `Abono/Pago registrado por $${Number(newPayment.amount).toLocaleString('es-CO')} COP para ${customer.fullName}. Método: ${paymentMethod}`,
         },
       });
 
