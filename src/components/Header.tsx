@@ -14,7 +14,8 @@ import {
   Radio,
   Menu,
   X,
-  UserCheck
+  UserCheck,
+  Download
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -109,7 +110,20 @@ export default function Header({ realtimeStatus = true }: HeaderProps) {
           </nav>
 
           {/* Acciones de usuario / Admin */}
-          <div className="hidden sm:flex items-center gap-2.5">
+          <div className="hidden sm:flex items-center gap-2">
+            <button
+              onClick={() => {
+                if (typeof window !== 'undefined') {
+                  window.dispatchEvent(new CustomEvent('open-pwa-install'));
+                }
+              }}
+              title="Instalar como aplicación en tu móvil o equipo"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-zinc-800 hover:bg-zinc-700 text-zinc-100 border border-zinc-700 transition-colors cursor-pointer"
+            >
+              <Download className="w-3.5 h-3.5 text-zinc-400" />
+              <span>Instalar App</span>
+            </button>
+
             {adminUser && (
               <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-900/90 border border-zinc-800 text-xs text-zinc-300">
                 <UserCheck className="w-3.5 h-3.5 text-zinc-400" />
@@ -141,6 +155,19 @@ export default function Header({ realtimeStatus = true }: HeaderProps) {
       {/* Menú Desplegable Móvil */}
       {mobileMenuOpen && (
         <div className="lg:hidden border-t border-zinc-800 bg-zinc-950/95 px-4 pt-3 pb-4 space-y-1.5">
+          <button
+            onClick={() => {
+              setMobileMenuOpen(false);
+              if (typeof window !== 'undefined') {
+                window.dispatchEvent(new CustomEvent('open-pwa-install'));
+              }
+            }}
+            className="w-full flex items-center justify-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold text-zinc-950 bg-zinc-100 hover:bg-white shadow-sm transition-colors cursor-pointer mb-2"
+          >
+            <Download className="w-4 h-4" />
+            <span>Instalar Aplicación (Android / iOS)</span>
+          </button>
+
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href;
